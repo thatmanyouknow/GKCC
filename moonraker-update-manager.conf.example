@@ -1,0 +1,12 @@
+# The installer creates a machine-specific copy of this section in:
+# ~/printer_data/config/gkcc-update-manager.conf
+
+[update_manager gkcc]
+type: git_repo
+channel: dev
+path: ~/GKCC
+origin: https://github.com/thatmanyouknow/GKCC.git
+primary_branch: main
+managed_services: gkcc
+info_tags:
+    desc=GKCC Calibration Center

@@ -1,0 +1,37 @@
+GKCC GITHUB UPLOAD STEPS
+========================
+
+IMPORTANT: Do not upload this ZIP as one file and stop there. GitHub will store
+it as a ZIP; it will not unpack it into the repository, and Moonraker cannot
+update the application that way.
+
+1. Extract GKCC_GitHub_Upload_v0.1.1.zip on your Windows PC.
+2. Open the extracted "GKCC-upload" folder.
+3. Open https://github.com/thatmanyouknow/GKCC in your browser.
+4. Click Add file -> Upload files.
+5. Drag ALL CONTENTS from inside GKCC-upload into the upload page.
+   README.md, install.sh, calibration_center.py, and the other files must appear
+   at the root of the repository. Do not leave them inside another folder.
+6. Use this commit message:
+       Initial GKCC Calibration Center v0.1.1
+7. Commit directly to the main branch.
+8. On the Releases or Tags page, create tag:
+       v0.1.1
+
+FIRST INSTALL ON THE PRINTER
+============================
+
+cd ~
+git clone https://github.com/thatmanyouknow/GKCC.git
+cd GKCC
+sudo bash install.sh
+
+Open:
+http://mainsailos.local:7128
+
+FUTURE REVISIONS
+================
+
+Upload changed files to GitHub and commit them. Then use Mainsail Update Manager
+and press Update beside gkcc. Do not upload replacement ZIP files to the repo as
+the update method.

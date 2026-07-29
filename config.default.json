@@ -1,0 +1,8 @@
+{
+  "port": 7128,
+  "moonraker_url": "http://127.0.0.1:7125",
+  "screen_pin": "1830",
+  "poll_seconds": 1.0,
+  "printer_name": "Voron V2.1830",
+  "allow_machine_actions": true
+}

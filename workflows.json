@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "workflows": [
+    {
+      "id": "printer_snapshot",
+      "section": "Printer baseline",
+      "title": "Capture printer baseline",
+      "summary": "Read the live Klipper configuration and save an as-built snapshot for the final manual.",
+      "status": "ready",
+      "steps": [
+        {"id": "connect", "title": "Confirm connection", "kind": "check", "instructions": "Klipper must report Ready. No machine movement is performed."},
+        {"id": "capture", "title": "Capture configuration", "kind": "snapshot", "instructions": "Save the current Klipper configuration and relevant live status to the calibration record."},
+        {"id": "notes", "title": "Add baseline notes", "kind": "text", "instructions": "Record recent repairs, modifications, or known issues."}
+      ]
+    },
+    {
+      "id": "erfc_toolhead_manual",
+      "section": "ERCF / Happy Hare",
+      "title": "Toolhead sensors and first extrusion",
+      "summary": "Baby-step filament, watch live sensor states, and mark entry, toolhead, and first-steady-extrusion positions.",
+      "status": "ready",
+      "safety": "Only run while the printer is idle. Heat the nozzle before pushing filament through the nozzle. Keep hands clear of gears and the cutter.",
+      "steps": [
+        {"id": "prepare", "title": "Prepare the toolhead", "kind": "checklist", "instructions": "Start with the correct gate selected. For physical geometry, use a clean/cold-pulled toolhead. Lock the tension/compression mechanism during Happy Hare geometry measurements."},
+        {"id": "sensor_entry", "title": "Mark extruder-entry sensor", "kind": "motion_mark", "marker": "extruder_entry", "instructions": "Advance slowly until the entry sensor changes state, then mark the position."},
+        {"id": "sensor_toolhead", "title": "Mark post-extruder toolhead sensor", "kind": "motion_mark", "marker": "toolhead_sensor", "instructions": "Continue through the extruder gears until the toolhead sensor changes state, then mark the position."},
+        {"id": "steady_extrusion", "title": "Mark first steady extrusion", "kind": "motion_mark_hot", "marker": "first_steady_extrusion", "instructions": "Heat for the selected filament. Advance in small steps and mark the first continuous strand—not the first drool."},
+        {"id": "repeat", "title": "Repeat and compare", "kind": "repeat", "instructions": "Run the measurement at least three times. The report will show the average and spread."},
+        {"id": "review", "title": "Review results", "kind": "review", "instructions": "Compare measured values with current Happy Hare settings. This release records recommendations but does not edit configuration files."}
+      ]
+    },
+    {
+      "id": "purge_matrix_manual",
+      "section": "Filament laboratory",
+      "title": "Directional purge-volume samples",
+      "summary": "Record outgoing/incoming filament pairs and the first visually clean stepped purge sample.",
+      "status": "planned",
+      "steps": [
+        {"id": "pair", "title": "Choose transition", "kind": "pair", "instructions": "Select outgoing and incoming filament profiles."},
+        {"id": "samples", "title": "Produce stepped samples", "kind": "planned", "instructions": "A later release will generate numbered purge tiles or strips."},
+        {"id": "select", "title": "Select first clean sample", "kind": "planned", "instructions": "Choose the first clean sample and apply a safety margin."}
+      ]
+    }
+  ]
+}

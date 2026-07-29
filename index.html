@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GKCC Calibration Center</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0e1116;--panel:#171c23;--panel2:#10151b;--line:#303844;
+  --text:#edf2f7;--muted:#9da9b7;--accent:#ee3b3b;--accent2:#ff6a55;
+  --ok:#55d28b;--warn:#f4c95d;--danger:#ff6666;--button:#29313b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,select,textarea{font:inherit}
+header{position:sticky;top:0;z-index:10;background:#10141aeF;border-bottom:1px solid var(--line);backdrop-filter:blur(10px);padding:14px 18px;display:flex;justify-content:space-between;gap:16px;align-items:center}
+h1{font-size:20px;margin:0}.subtitle{color:var(--muted);font-size:12px}.brand{display:flex;align-items:center;gap:10px}.mark{width:14px;height:28px;background:linear-gradient(180deg,var(--accent2),var(--accent));clip-path:polygon(45% 0,100% 0,55% 43%,100% 43%,25% 100%,44% 57%,0 57%)}
+.badges{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.badge{border:1px solid var(--line);background:var(--panel);padding:5px 9px;border-radius:999px;font-size:12px;color:var(--muted)}.badge.ok{color:var(--ok);border-color:#2e6f4a}.badge.bad{color:var(--danger);border-color:#7b3838}.badge.warn{color:var(--warn);border-color:#6f5c2f}
+.layout{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:calc(100vh - 67px)}
+nav{border-right:1px solid var(--line);padding:16px;background:#11161c}nav button{width:100%;text-align:left;border:0;background:transparent;color:var(--muted);padding:11px 12px;border-radius:9px;cursor:pointer;margin:2px 0}nav button:hover{background:#1c232c;color:var(--text)}nav button.active{background:#2a2023;color:#fff;border-left:3px solid var(--accent)}
+main{padding:22px;max-width:1250px;width:100%;margin:0 auto}.view{display:none}.view.active{display:block}
+h2{margin:0 0 5px;font-size:26px}.lead{color:var(--muted);margin:0 0 20px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}.card h3{margin:0 0 9px;font-size:16px}.metric{font-size:28px;font-weight:750}.muted{color:var(--muted)}.small{font-size:12px}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.divider{border:0;border-top:1px solid var(--line);margin:16px 0}
+button.action{border:0;border-radius:9px;padding:10px 13px;font-weight:700;cursor:pointer;background:var(--accent);color:white}button.secondary{background:var(--button);color:var(--text)}button.warn{background:#6e5621;color:#fff}button.danger{background:#7b3030;color:#fff}button:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+input,select,textarea{width:100%;background:var(--panel2);color:var(--text);border:1px solid #3a4451;border-radius:9px;padding:9px}label{display:block;color:var(--muted);font-size:12px;margin:10px 0 5px}textarea{min-height:90px;resize:vertical}
+.workflow{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}.status-pill{font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}.status-pill.ready{color:var(--ok)}.status-pill.planned{color:var(--warn)}
+.steps{display:grid;gap:10px;margin-top:14px}.step{border:1px solid var(--line);border-radius:10px;padding:13px;background:var(--panel2)}.step-title{font-weight:750}.step-number{display:inline-grid;place-items:center;width:25px;height:25px;border-radius:50%;background:#312329;color:#fff;margin-right:7px}
+.motion{display:grid;grid-template-columns:1fr 1fr;gap:14px}.motion-pad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.motion-pad button{padding:14px 6px}.sensor-table{width:100%;border-collapse:collapse}.sensor-table td{border-bottom:1px solid var(--line);padding:7px 5px;vertical-align:top}.sensor-table td:first-child{color:var(--muted);width:46%}
+.marker-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.marker{background:#10151b;border:1px solid var(--line);border-radius:10px;padding:12px}.marker-value{font-size:23px;font-weight:750}.log{background:#090c10;border:1px solid #252c35;border-radius:9px;padding:10px;min-height:90px;max-height:220px;overflow:auto;white-space:pre-wrap;font:12px ui-monospace,SFMono-Regular,Consolas,monospace}
+.progress{height:10px;background:#0d1116;border-radius:999px;overflow:hidden;border:1px solid #303844}.progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0}
+.notice{background:#2a2414;border:1px solid #6e5a25;color:#f2d883;border-radius:10px;padding:11px}.danger-note{background:#2e1719;border:1px solid #6e3034;color:#ffb5b5;border-radius:10px;padding:11px}
+.hidden{display:none!important}
+@media(max-width:900px){.layout{grid-template-columns:1fr}nav{position:sticky;top:67px;z-index:8;border-right:0;border-bottom:1px solid var(--line);display:flex;overflow:auto;padding:8px}nav button{width:auto;white-space:nowrap}.grid,.grid2,.motion,.marker-grid{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="mark"></div><div><h1>GKCC Calibration Center <span class="subtitle">v0.1.1</span></h1><div class="subtitle">Ellis-style guided setup · operator-confirmed results</div></div></div>
+  <div class="badges"><div id="connectionBadge" class="badge">Connecting…</div><div id="printBadge" class="badge">Print: unknown</div><div id="lockBadge" class="badge warn">Controls locked</div></div>
+</header>
+<div class="layout">
+<nav>
+  <button data-view="dashboard" class="active">Overview</button>
+  <button data-view="printer">Printer baseline</button>
+  <button data-view="erfc">ERCF / Happy Hare</button>
+  <button data-view="filament">Filament laboratory</button>
+  <button data-view="report">Manual & records</button>
+  <button data-view="settings">Profile</button>
+</nav>
+<main>
+<section id="dashboard" class="view active">
+  <h2>Calibration overview</h2><p class="lead">One test at a time. Measure, record, review, then apply later.</p>
+  <div class="grid">
+    <div class="card"><h3>Printer</h3><div id="printerState" class="metric">—</div><div id="stateMessage" class="muted">Waiting for Moonraker</div></div>
+    <div class="card"><h3>Toolhead</h3><div id="position" class="metric mono">X— Y— Z—</div><div id="homed" class="muted">Homed: —</div></div>
+    <div class="card"><h3>Temperature</h3><div id="hotendTemp" class="metric">— °C</div><div id="bedTemp" class="muted">Bed: — °C</div></div>
+  </div>
+  <div style="height:14px"></div>
+  <div class="grid2">
+    <div class="card"><h3>Calibration progress</h3><div class="progress"><div id="progressBar"></div></div><p id="progressText" class="muted">No completed workflows yet.</p></div>
+    <div class="card"><h3>Safe foundation</h3><p class="muted">This release reads the printer, guides manual measurements, and builds the as-built record. It does not edit Klipper or Happy Hare configuration files.</p><div class="row"><button class="action" onclick="unlock()">Unlock controls</button><button class="secondary action" onclick="captureSnapshot()">Capture baseline</button></div></div>
+  </div>
+  <div style="height:14px"></div><div class="card"><h3>Available workflows</h3><div id="workflowList"></div></div>
+</section>
+
+<section id="printer" class="view">
+  <h2>Printer baseline</h2><p class="lead">Capture the machine exactly as it is before changing calibration values.</p>
+  <div class="grid2">
+    <div class="card"><h3>Live state</h3><table class="sensor-table"><tr><td>Klipper</td><td id="baseKlipper">—</td></tr><tr><td>Print state</td><td id="basePrint">—</td></tr><tr><td>Homed axes</td><td id="baseHomed">—</td></tr><tr><td>Object count</td><td id="objectCount">—</td></tr></table></div>
+    <div class="card"><h3>Snapshot</h3><p class="muted">Stores the loaded Klipper configuration and relevant live objects in the calibration record.</p><button class="action" onclick="captureSnapshot()">Capture live configuration</button><div id="snapshotResult" class="small muted" style="margin-top:10px"></div></div>
+  </div>
+  <div style="height:14px"></div><div class="card"><h3>Baseline notes</h3><textarea id="baselineNotes" placeholder="Recent rebuilds, replacement parts, known issues…"></textarea><div class="row" style="margin-top:10px"><button class="action" onclick="saveBaselineNotes()">Record baseline notes</button></div></div>
+</section>
+
+<section id="erfc" class="view">
+  <h2>ERCF / Happy Hare</h2><p class="lead">Manual-assist toolhead geometry and first-extrusion measurement.</p>
+  <div class="danger-note"><strong>Safety:</strong> Only use these controls while idle. Do not push filament through a cold nozzle. Keep fingers clear of the extruder, selector, and cutter.</div>
+  <div style="height:14px"></div>
+  <div class="motion">
+    <div class="card">
+      <h3>Baby-step filament</h3>
+      <div class="grid2"><div><label>Motor mode</label><select id="motorMode"><option value="extruder">Extruder</option><option value="gear">ERCF gear</option><option value="gear+extruder">Gear commands, extruder linked</option><option value="extruder+gear">Extruder commands, gear linked</option></select></div><div><label>Move speed (mm/s)</label><input id="moveSpeed" type="number" min="0.1" max="100" step="0.1" value="5"></div></div>
+      <label>Step controls</label>
+      <div class="motion-pad">
+        <button class="secondary action" onclick="move(-10)">−10</button><button class="secondary action" onclick="move(-1)">−1</button><button class="secondary action" onclick="move(-0.1)">−0.1</button><button class="secondary action" onclick="move(-0.02)">−0.02</button>
+        <button class="action" onclick="move(10)">+10</button><button class="action" onclick="move(1)">+1</button><button class="action" onclick="move(0.1)">+0.1</button><button class="action" onclick="move(0.02)">+0.02</button>
+      </div>
+      <hr class="divider"><div class="row"><div><span class="muted">Session position</span><div id="sessionPosition" class="metric mono">0.000 mm</div></div><button class="secondary action" onclick="resetSessionPosition()">Zero counter</button></div>
+      <hr class="divider"><div class="grid2"><div><label>Hotend target</label><input id="hotendTarget" type="number" value="265" min="0" max="290"></div><div class="row" style="align-items:end"><button class="warn action" onclick="setHotend()">Set hotend</button><button class="danger action" onclick="heatersOff()">Heaters off</button></div></div>
+    </div>
+    <div class="card"><h3>Live sensors</h3><div id="sensorSummary" class="muted">Waiting for printer objects…</div><table id="sensorTable" class="sensor-table"></table><hr class="divider"><button class="secondary action" onclick="runMmuStatus()">Request MMU_STATUS</button></div>
+  </div>
+  <div style="height:14px"></div>
+  <div class="card"><h3>Mark measured positions</h3><p class="muted">The counter records commanded movement from your chosen zero. Repeat the test and save each run.</p>
+    <div class="marker-grid">
+      <div class="marker"><div class="muted small">Extruder-entry sensor</div><div id="markEntry" class="marker-value mono">—</div><button class="secondary action" onclick="mark('entry')">Mark current</button></div>
+      <div class="marker"><div class="muted small">Post-extruder sensor</div><div id="markToolhead" class="marker-value mono">—</div><button class="secondary action" onclick="mark('toolhead')">Mark current</button></div>
+      <div class="marker"><div class="muted small">First steady extrusion</div><div id="markExtrusion" class="marker-value mono">—</div><button class="secondary action" onclick="mark('extrusion')">Mark current</button></div>
+    </div>
+    <label>Run notes</label><textarea id="erfcNotes" placeholder="Filament, temperature, sensor behaviour, cutter state…"></textarea>
+    <div class="row" style="margin-top:10px"><button class="action" onclick="saveErfcRun()">Save this measurement run</button><button class="secondary action" onclick="clearMarkers()">Clear markers</button></div>
+  </div>
+  <div style="height:14px"></div><div class="card"><h3>Command log</h3><div id="actionLog" class="log">No calibration commands sent.</div></div>
+</section>
+
+<section id="filament" class="view">
+  <h2>Filament laboratory</h2><p class="lead">The next module will build directional purge-volume samples and per-filament records.</p>
+  <div class="notice"><strong>Planned:</strong> choose a FROM and TO filament, print stepped purge samples, select the first clean sample, and record the directional matrix with a safety margin.</div>
+  <div style="height:14px"></div><div class="card"><h3>Current project scope</h3><p class="muted">The data model and report are already prepared. Automated purge-tile generation is intentionally not enabled in v0.1.1.</p></div>
+</section>
+
+<section id="report" class="view">
+  <h2>Manual & records</h2><p class="lead">The report grows as calibration steps are completed.</p>
+  <div class="grid2"><div class="card"><h3>Printable manual</h3><p class="muted">Opens an HTML as-built manual that can be printed or saved as PDF from the browser.</p><a href="/report" target="_blank"><button class="action">Open manual</button></a></div><div class="card"><h3>Raw backup</h3><p class="muted">Download the profile, completed results, and captured Klipper snapshot as JSON.</p><a href="/api/export"><button class="secondary action">Download JSON export</button></a></div></div>
+  <div style="height:14px"></div><div class="card"><h3>Recorded workflow runs</h3><div id="recordList" class="muted">No records loaded.</div></div>
+</section>
+
+<section id="settings" class="view">
+  <h2>Printer profile</h2><p class="lead">Basic as-built identity used on the generated manual.</p>
+  <div class="card"><div class="grid2"><div><label>Printer name</label><input id="profileName"></div><div><label>Serial / build number</label><input id="profileSerial"></div><div><label>Build volume</label><input id="profileVolume"></div><div><label>MMU type</label><input id="profileMmu"></div><div><label>MMU gates</label><input id="profileGates" type="number"></div><div><label>Technician</label><input id="profileTech"></div></div><label>Printer notes</label><textarea id="profileNotes"></textarea><div class="row" style="margin-top:10px"><button class="action" onclick="saveProfile()">Save profile</button></div></div>
+</section>
+</main>
+</div>
+<script>
+let token=sessionStorage.getItem('vccToken')||'';
+let currentState={};let workflows=[];let records={workflow_runs:[]};let sessionPosition=0;let markers={entry:null,toolhead:null,extrusion:null};
+async function api(path,options={}){options.headers=options.headers||{};if(token)options.headers['X-Calibration-Token']=token;const r=await fetch(path,options);let data={};try{data=await r.json()}catch(e){}if(!r.ok)throw new Error(data.error||`HTTP ${r.status}`);return data}
+function fmt(v,d=1){const n=Number(v);return Number.isFinite(n)?n.toFixed(d):'—'}
+function log(msg){const box=document.getElementById('actionLog');box.textContent=`${new Date().toLocaleTimeString()}  ${msg}\n`+box.textContent}
+async function unlock(){const pin=prompt('Calibration Center PIN');if(pin===null)return;try{const r=await api('/api/unlock',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin})});token=r.token;sessionStorage.setItem('vccToken',token);setLock(true);log('Machine controls unlocked for 15 minutes.')}catch(e){alert(e.message)}}
+function setLock(unlocked){const b=document.getElementById('lockBadge');b.textContent=unlocked?'Controls unlocked':'Controls locked';b.className='badge '+(unlocked?'ok':'warn')}
+function renderState(s){currentState=s;const cb=document.getElementById('connectionBadge');cb.textContent=s.connected?`Klipper: ${s.printer_state}`:'Disconnected';cb.className='badge '+(s.connected&&s.printer_state==='ready'?'ok':'bad');const pb=document.getElementById('printBadge');pb.textContent=`Print: ${s.print_state||'unknown'}`;pb.className='badge '+(['printing','paused'].includes(s.print_state)?'warn':'');setLock(!!s.controls_unlocked);
+ document.getElementById('printerState').textContent=s.printer_state||'unknown';document.getElementById('stateMessage').textContent=s.error||s.state_message||'';const p=s.position||[];document.getElementById('position').textContent=`X${fmt(p[0])} Y${fmt(p[1])} Z${fmt(p[2])}`;document.getElementById('homed').textContent=`Homed: ${s.homed_axes||'none'}`;document.getElementById('hotendTemp').textContent=`${fmt(s.extruder?.temperature)} °C`;document.getElementById('bedTemp').textContent=`Bed: ${fmt(s.heater_bed?.temperature)} °C`;document.getElementById('baseKlipper').textContent=s.printer_state||'—';document.getElementById('basePrint').textContent=s.print_state||'—';document.getElementById('baseHomed').textContent=s.homed_axes||'none';document.getElementById('objectCount').textContent=(s.available_objects||[]).length;renderSensors(s);}
+function flatten(prefix,obj,out){if(obj===null||obj===undefined){out.push([prefix,String(obj)]);return}if(typeof obj!=='object'){out.push([prefix,String(obj)]);return}for(const [k,v] of Object.entries(obj)){const name=prefix?`${prefix}.${k}`:k;if(typeof v==='object'&&v!==null&&!Array.isArray(v))flatten(name,v,out);else out.push([name,Array.isArray(v)?JSON.stringify(v):String(v)])}}
+function renderSensors(s){const rows=[];flatten('',s.sensors||{},rows);flatten('',s.mmu||{},rows);const interesting=rows.filter(([k])=>/sensor|switch|tension|compression|filament|encoder|position|gate|tool/i.test(k)).slice(0,80);const table=document.getElementById('sensorTable');table.innerHTML=interesting.map(([k,v])=>`<tr><td>${escapeHtml(k)}</td><td class="mono">${escapeHtml(v)}</td></tr>`).join('');document.getElementById('sensorSummary').textContent=interesting.length?`${interesting.length} live MMU/sensor values shown`:'No Happy Hare sensor fields found yet. Use MMU_STATUS and confirm the MMU object is loaded.'}
+function escapeHtml(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+async function poll(){try{renderState(await api('/api/status'))}catch(e){document.getElementById('connectionBadge').textContent=e.message}setTimeout(poll,1000)}
+async function loadWorkflows(){const r=await api('/api/workflows');workflows=r.workflows||[];const list=document.getElementById('workflowList');list.innerHTML=workflows.map(w=>`<div class="workflow"><div><strong>${escapeHtml(w.title)}</strong><div class="muted small">${escapeHtml(w.section)} · ${escapeHtml(w.summary)}</div></div><span class="status-pill ${w.status}">${w.status}</span></div><hr class="divider">`).join('')}
+async function loadRecords(){records=await api('/api/records');const runs=records.workflow_runs||[];const completed=new Set(runs.map(r=>r.workflow_id));const ready=workflows.filter(w=>w.status==='ready').length||1;const pct=Math.min(100,Math.round(completed.size/ready*100));document.getElementById('progressBar').style.width=pct+'%';document.getElementById('progressText').textContent=`${completed.size} workflow type(s) recorded · ${pct}% of current v0.1 scope`;document.getElementById('recordList').innerHTML=runs.length?runs.slice().reverse().map(r=>`<div class="step"><div class="step-title">${escapeHtml(r.title||r.workflow_id)}</div><div class="small muted">${escapeHtml(r.completed_at||'')}</div><pre class="mono small">${escapeHtml(JSON.stringify(r.results||{},null,2))}</pre><div>${escapeHtml(r.notes||'')}</div></div>`).join(''):'No completed calibration records yet.'}
+async function captureSnapshot(){try{const r=await api('/api/snapshot',{method:'POST'});document.getElementById('snapshotResult').textContent=`Captured ${r.object_count} objects at ${r.captured_at}`;log(`Printer baseline captured (${r.object_count} objects).`);await loadRecords()}catch(e){alert(e.message)}}
+async function saveBaselineNotes(){const notes=document.getElementById('baselineNotes').value;try{await api('/api/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({workflow_id:'printer_snapshot',title:'Printer baseline notes',results:{operator_entry:true},notes})});document.getElementById('baselineNotes').value='';await loadRecords()}catch(e){alert(e.message)}}
+async function move(amount){try{const speed=Number(document.getElementById('moveSpeed').value);const motor=document.getElementById('motorMode').value;const r=await api('/api/action/mmu_move',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({move:amount,speed,motor})});sessionPosition+=amount;updateSession();log(r.script||`Moved ${amount} mm`)}catch(e){log('MOVE FAILED: '+e.message);alert(e.message)}}
+function updateSession(){document.getElementById('sessionPosition').textContent=`${sessionPosition.toFixed(3)} mm`;document.getElementById('markEntry').textContent=markers.entry===null?'—':`${markers.entry.toFixed(3)} mm`;document.getElementById('markToolhead').textContent=markers.toolhead===null?'—':`${markers.toolhead.toFixed(3)} mm`;document.getElementById('markExtrusion').textContent=markers.extrusion===null?'—':`${markers.extrusion.toFixed(3)} mm`}
+function resetSessionPosition(){sessionPosition=0;updateSession();log('Session movement counter zeroed.')}
+function mark(which){markers[which]=sessionPosition;updateSession();log(`${which} marked at ${sessionPosition.toFixed(3)} mm.`)}
+function clearMarkers(){markers={entry:null,toolhead:null,extrusion:null};sessionPosition=0;updateSession();log('Markers cleared.')}
+async function setHotend(){const target=Number(document.getElementById('hotendTarget').value);try{const r=await api('/api/action/hotend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target})});log(r.script||`Hotend target ${target}°C`)}catch(e){alert(e.message)}}
+async function heatersOff(){try{await api('/api/action/heaters_off',{method:'POST'});log('Heaters turned off.')}catch(e){alert(e.message)}}
+async function runMmuStatus(){try{await api('/api/action/status',{method:'POST'});log('MMU_STATUS requested. Check the Mainsail console for full formatted output.')}catch(e){alert(e.message)}}
+async function saveErfcRun(){const notes=document.getElementById('erfcNotes').value;const results={motor_mode:document.getElementById('motorMode').value,move_speed_mm_s:Number(document.getElementById('moveSpeed').value),hotend_target_c:Number(document.getElementById('hotendTarget').value),extruder_entry_mm:markers.entry,toolhead_sensor_mm:markers.toolhead,first_steady_extrusion_mm:markers.extrusion,entry_to_toolhead_mm:(markers.entry!==null&&markers.toolhead!==null)?markers.toolhead-markers.entry:null,toolhead_to_extrusion_mm:(markers.toolhead!==null&&markers.extrusion!==null)?markers.extrusion-markers.toolhead:null};try{await api('/api/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({workflow_id:'erfc_toolhead_manual',title:'ERCF toolhead manual measurement',results,notes})});log('Measurement run saved to the manual.');await loadRecords()}catch(e){alert(e.message)}}
+async function loadProfile(){const p=await api('/api/profile');document.getElementById('profileName').value=p.printer?.name||'';document.getElementById('profileSerial').value=p.printer?.serial||'';document.getElementById('profileVolume').value=p.printer?.build_volume||'';document.getElementById('profileMmu').value=p.mmu?.type||'';document.getElementById('profileGates').value=p.mmu?.gates??'';document.getElementById('profileTech').value=p.technician||'';document.getElementById('profileNotes').value=p.printer?.notes||''}
+async function saveProfile(){try{const old=await api('/api/profile');old.printer=old.printer||{};old.mmu=old.mmu||{};old.printer.name=document.getElementById('profileName').value;old.printer.serial=document.getElementById('profileSerial').value;old.printer.build_volume=document.getElementById('profileVolume').value;old.printer.notes=document.getElementById('profileNotes').value;old.mmu.type=document.getElementById('profileMmu').value;old.mmu.gates=Number(document.getElementById('profileGates').value);old.technician=document.getElementById('profileTech').value;await api('/api/profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(old)});alert('Profile saved.')}catch(e){alert(e.message)}}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.view).classList.add('active')});
+(async()=>{updateSession();await loadWorkflows();await Promise.all([loadRecords(),loadProfile()]);poll()})().catch(e=>console.error(e));
+</script>
+</body>
+</html>
