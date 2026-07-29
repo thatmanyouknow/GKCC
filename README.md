@@ -1,4 +1,4 @@
-# GKCC Calibration Center
+# Graphical Klipper Calibration Center
 
 GKCC is a lightweight browser-based calibration application for a Klipper / Moonraker Voron and ERCF / Happy Hare installation.
 
