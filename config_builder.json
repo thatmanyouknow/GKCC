@@ -1,0 +1,1520 @@
+{
+  "version": 3,
+  "title": "Klipper configuration builder",
+  "sources": {
+    "klipper": "https://www.klipper3d.org/Config_Reference.html",
+    "ellis": "https://ellis3dp.com/Print-Tuning-Guide/",
+    "happy_hare": "https://github.com/moggieuk/Happy-Hare/wiki"
+  },
+  "groups": [
+    {
+      "id": "identity",
+      "title": "1. Printer identity and controller",
+      "summary": "Name the machine, choose its kinematics, and identify the main MCU.",
+      "diagram": "printer",
+      "fields": [
+        {
+          "key": "meta.printer_name",
+          "label": "Printer name",
+          "type": "text",
+          "required": true,
+          "placeholder": "Voron V2.4 350"
+        },
+        {
+          "key": "printer.kinematics",
+          "section": "printer",
+          "option": "kinematics",
+          "label": "Kinematics",
+          "type": "select",
+          "required": true,
+          "options": [
+            "corexy",
+            "cartesian",
+            "corexz",
+            "delta",
+            "hybrid_corexy",
+            "hybrid_corexz",
+            "none"
+          ]
+        },
+        {
+          "key": "mcu.serial",
+          "section": "mcu",
+          "option": "serial",
+          "label": "Main MCU serial",
+          "type": "text",
+          "required": true,
+          "placeholder": "/dev/serial/by-id/..."
+        },
+        {
+          "key": "mcu.canbus_uuid",
+          "section": "mcu",
+          "option": "canbus_uuid",
+          "label": "Main MCU CAN UUID",
+          "type": "text",
+          "placeholder": "Use instead of serial when applicable"
+        },
+        {
+          "key": "printer.max_velocity",
+          "section": "printer",
+          "option": "max_velocity",
+          "label": "Maximum velocity (mm/s)",
+          "type": "number",
+          "required": true,
+          "min": 1,
+          "step": 1
+        },
+        {
+          "key": "printer.max_accel",
+          "section": "printer",
+          "option": "max_accel",
+          "label": "Maximum acceleration (mm/s²)",
+          "type": "number",
+          "required": true,
+          "min": 1,
+          "step": 1
+        },
+        {
+          "key": "printer.max_z_velocity",
+          "section": "printer",
+          "option": "max_z_velocity",
+          "label": "Maximum Z velocity (mm/s)",
+          "type": "number",
+          "required": true,
+          "min": 1,
+          "step": 0.1
+        },
+        {
+          "key": "printer.max_z_accel",
+          "section": "printer",
+          "option": "max_z_accel",
+          "label": "Maximum Z acceleration (mm/s²)",
+          "type": "number",
+          "required": true,
+          "min": 1,
+          "step": 1
+        },
+        {
+          "key": "printer.square_corner_velocity",
+          "section": "printer",
+          "option": "square_corner_velocity",
+          "label": "Square corner velocity (mm/s)",
+          "type": "number",
+          "min": 0,
+          "step": 0.1
+        }
+      ]
+    },
+    {
+      "id": "motion_xy",
+      "title": "2. X and Y motion",
+      "summary": "Pins, mechanics, travel limits, and endstops for the horizontal axes.",
+      "diagram": "printer",
+      "fields": [
+        {
+          "key": "stepper_x.step_pin",
+          "section": "stepper_x",
+          "option": "step_pin",
+          "label": "X step pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "stepper_x.dir_pin",
+          "section": "stepper_x",
+          "option": "dir_pin",
+          "label": "X direction pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "stepper_x.enable_pin",
+          "section": "stepper_x",
+          "option": "enable_pin",
+          "label": "X enable pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "stepper_x.microsteps",
+          "section": "stepper_x",
+          "option": "microsteps",
+          "label": "X microsteps",
+          "type": "number",
+          "required": true,
+          "min": 1,
+          "step": 1
+        },
+        {
+          "key": "stepper_x.rotation_distance",
+          "section": "stepper_x",
+          "option": "rotation_distance",
+          "label": "X rotation distance",
+          "type": "number",
+          "required": true,
+          "min": 0.001,
+          "step": 0.001
+        },
+        {
+          "key": "stepper_x.endstop_pin",
+          "section": "stepper_x",
+          "option": "endstop_pin",
+          "label": "X endstop pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "stepper_x.position_endstop",
+          "section": "stepper_x",
+          "option": "position_endstop",
+          "label": "X endstop position",
+          "type": "number",
+          "required": true,
+          "step": 0.01
+        },
+        {
+          "key": "stepper_x.position_min",
+          "section": "stepper_x",
+          "option": "position_min",
+          "label": "X minimum",
+          "type": "number",
+          "step": 0.01
+        },
+        {
+          "key": "stepper_x.position_max",
+          "section": "stepper_x",
+          "option": "position_max",
+          "label": "X maximum",
+          "type": "number",
+          "required": true,
+          "step": 0.01
+        },
+        {
+          "key": "stepper_x.homing_speed",
+          "section": "stepper_x",
+          "option": "homing_speed",
+          "label": "X homing speed",
+          "type": "number",
+          "min": 0.1,
+          "step": 0.1
+        },
+        {
+          "key": "stepper_y.step_pin",
+          "section": "stepper_y",
+          "option": "step_pin",
+          "label": "Y step pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "stepper_y.dir_pin",
+          "section": "stepper_y",
+          "option": "dir_pin",
+          "label": "Y direction pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "stepper_y.enable_pin",
+          "section": "stepper_y",
+          "option": "enable_pin",
+          "label": "Y enable pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "stepper_y.microsteps",
+          "section": "stepper_y",
+          "option": "microsteps",
+          "label": "Y microsteps",
+          "type": "number",
+          "required": true,
+          "min": 1,
+          "step": 1
+        },
+        {
+          "key": "stepper_y.rotation_distance",
+          "section": "stepper_y",
+          "option": "rotation_distance",
+          "label": "Y rotation distance",
+          "type": "number",
+          "required": true,
+          "min": 0.001,
+          "step": 0.001
+        },
+        {
+          "key": "stepper_y.endstop_pin",
+          "section": "stepper_y",
+          "option": "endstop_pin",
+          "label": "Y endstop pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "stepper_y.position_endstop",
+          "section": "stepper_y",
+          "option": "position_endstop",
+          "label": "Y endstop position",
+          "type": "number",
+          "required": true,
+          "step": 0.01
+        },
+        {
+          "key": "stepper_y.position_min",
+          "section": "stepper_y",
+          "option": "position_min",
+          "label": "Y minimum",
+          "type": "number",
+          "step": 0.01
+        },
+        {
+          "key": "stepper_y.position_max",
+          "section": "stepper_y",
+          "option": "position_max",
+          "label": "Y maximum",
+          "type": "number",
+          "required": true,
+          "step": 0.01
+        },
+        {
+          "key": "stepper_y.homing_speed",
+          "section": "stepper_y",
+          "option": "homing_speed",
+          "label": "Y homing speed",
+          "type": "number",
+          "min": 0.1,
+          "step": 0.1
+        }
+      ]
+    },
+    {
+      "id": "motion_z",
+      "title": "3. Z motion and levelling",
+      "summary": "Primary Z motor, usable travel, probe, mesh, and gantry levelling.",
+      "diagram": "printer",
+      "fields": [
+        {
+          "key": "stepper_z.step_pin",
+          "section": "stepper_z",
+          "option": "step_pin",
+          "label": "Z step pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "stepper_z.dir_pin",
+          "section": "stepper_z",
+          "option": "dir_pin",
+          "label": "Z direction pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "stepper_z.enable_pin",
+          "section": "stepper_z",
+          "option": "enable_pin",
+          "label": "Z enable pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "stepper_z.microsteps",
+          "section": "stepper_z",
+          "option": "microsteps",
+          "label": "Z microsteps",
+          "type": "number",
+          "required": true,
+          "min": 1,
+          "step": 1
+        },
+        {
+          "key": "stepper_z.rotation_distance",
+          "section": "stepper_z",
+          "option": "rotation_distance",
+          "label": "Z rotation distance",
+          "type": "number",
+          "required": true,
+          "min": 0.001,
+          "step": 0.001
+        },
+        {
+          "key": "stepper_z.endstop_pin",
+          "section": "stepper_z",
+          "option": "endstop_pin",
+          "label": "Z endstop pin or probe:z_virtual_endstop",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "stepper_z.position_min",
+          "section": "stepper_z",
+          "option": "position_min",
+          "label": "Z minimum",
+          "type": "number",
+          "step": 0.01
+        },
+        {
+          "key": "stepper_z.position_max",
+          "section": "stepper_z",
+          "option": "position_max",
+          "label": "Z maximum",
+          "type": "number",
+          "required": true,
+          "step": 0.01
+        },
+        {
+          "key": "probe.pin",
+          "section": "probe",
+          "option": "pin",
+          "label": "Probe pin",
+          "type": "text"
+        },
+        {
+          "key": "probe.x_offset",
+          "section": "probe",
+          "option": "x_offset",
+          "label": "Probe X offset",
+          "type": "number",
+          "step": 0.01
+        },
+        {
+          "key": "probe.y_offset",
+          "section": "probe",
+          "option": "y_offset",
+          "label": "Probe Y offset",
+          "type": "number",
+          "step": 0.01
+        },
+        {
+          "key": "probe.z_offset",
+          "section": "probe",
+          "option": "z_offset",
+          "label": "Probe Z offset",
+          "type": "number",
+          "step": 0.001
+        },
+        {
+          "key": "probe.speed",
+          "section": "probe",
+          "option": "speed",
+          "label": "Probe speed",
+          "type": "number",
+          "min": 0.1,
+          "step": 0.1
+        },
+        {
+          "key": "probe.samples",
+          "section": "probe",
+          "option": "samples",
+          "label": "Probe samples",
+          "type": "number",
+          "min": 1,
+          "step": 1
+        },
+        {
+          "key": "bed_mesh.mesh_min",
+          "section": "bed_mesh",
+          "option": "mesh_min",
+          "label": "Mesh minimum X,Y",
+          "type": "text",
+          "placeholder": "30, 30"
+        },
+        {
+          "key": "bed_mesh.mesh_max",
+          "section": "bed_mesh",
+          "option": "mesh_max",
+          "label": "Mesh maximum X,Y",
+          "type": "text",
+          "placeholder": "320, 320"
+        },
+        {
+          "key": "bed_mesh.probe_count",
+          "section": "bed_mesh",
+          "option": "probe_count",
+          "label": "Mesh probe count",
+          "type": "text",
+          "placeholder": "5, 5"
+        },
+        {
+          "key": "quad_gantry_level.gantry_corners",
+          "section": "quad_gantry_level",
+          "option": "gantry_corners",
+          "label": "QGL gantry corners",
+          "type": "textarea",
+          "placeholder": "-60,-10\n410,420"
+        },
+        {
+          "key": "quad_gantry_level.points",
+          "section": "quad_gantry_level",
+          "option": "points",
+          "label": "QGL probe points",
+          "type": "textarea",
+          "placeholder": "50,25\n50,275\n300,275\n300,25"
+        }
+      ]
+    },
+    {
+      "id": "toolhead",
+      "title": "4. Extruder, hotend, and toolhead",
+      "summary": "Extruder drive, heater, thermistor, fans, probe offsets, and filament path geometry.",
+      "diagram": "toolhead",
+      "fields": [
+        {
+          "key": "extruder.step_pin",
+          "section": "extruder",
+          "option": "step_pin",
+          "label": "Extruder step pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "extruder.dir_pin",
+          "section": "extruder",
+          "option": "dir_pin",
+          "label": "Extruder direction pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "extruder.enable_pin",
+          "section": "extruder",
+          "option": "enable_pin",
+          "label": "Extruder enable pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "extruder.microsteps",
+          "section": "extruder",
+          "option": "microsteps",
+          "label": "Extruder microsteps",
+          "type": "number",
+          "required": true,
+          "min": 1,
+          "step": 1
+        },
+        {
+          "key": "extruder.rotation_distance",
+          "section": "extruder",
+          "option": "rotation_distance",
+          "label": "Extruder rotation distance",
+          "type": "number",
+          "required": true,
+          "min": 0.001,
+          "step": 0.0001
+        },
+        {
+          "key": "extruder.gear_ratio",
+          "section": "extruder",
+          "option": "gear_ratio",
+          "label": "Extruder gear ratio",
+          "type": "text",
+          "placeholder": "50:10"
+        },
+        {
+          "key": "extruder.nozzle_diameter",
+          "section": "extruder",
+          "option": "nozzle_diameter",
+          "label": "Nozzle diameter",
+          "type": "number",
+          "required": true,
+          "min": 0.1,
+          "step": 0.01
+        },
+        {
+          "key": "extruder.filament_diameter",
+          "section": "extruder",
+          "option": "filament_diameter",
+          "label": "Filament diameter",
+          "type": "number",
+          "required": true,
+          "min": 1,
+          "step": 0.01
+        },
+        {
+          "key": "extruder.heater_pin",
+          "section": "extruder",
+          "option": "heater_pin",
+          "label": "Hotend heater pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "extruder.sensor_type",
+          "section": "extruder",
+          "option": "sensor_type",
+          "label": "Hotend sensor type",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "extruder.sensor_pin",
+          "section": "extruder",
+          "option": "sensor_pin",
+          "label": "Hotend sensor pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "extruder.control",
+          "section": "extruder",
+          "option": "control",
+          "label": "Hotend control",
+          "type": "select",
+          "options": [
+            "pid",
+            "watermark"
+          ]
+        },
+        {
+          "key": "extruder.min_temp",
+          "section": "extruder",
+          "option": "min_temp",
+          "label": "Hotend minimum temperature",
+          "type": "number",
+          "required": true,
+          "step": 1
+        },
+        {
+          "key": "extruder.max_temp",
+          "section": "extruder",
+          "option": "max_temp",
+          "label": "Hotend maximum temperature",
+          "type": "number",
+          "required": true,
+          "step": 1
+        },
+        {
+          "key": "extruder.max_extrude_only_distance",
+          "section": "extruder",
+          "option": "max_extrude_only_distance",
+          "label": "Maximum extrude-only distance",
+          "type": "number",
+          "min": 1,
+          "step": 1
+        },
+        {
+          "key": "extruder.pressure_advance",
+          "section": "extruder",
+          "option": "pressure_advance",
+          "label": "Pressure advance",
+          "type": "number",
+          "min": 0,
+          "step": 0.001,
+          "ellis": true
+        },
+        {
+          "key": "fan.pin",
+          "section": "fan",
+          "option": "pin",
+          "label": "Part-cooling fan pin",
+          "type": "text"
+        },
+        {
+          "key": "heater_fan hotend_fan.pin",
+          "section": "heater_fan hotend_fan",
+          "option": "pin",
+          "label": "Hotend fan pin",
+          "type": "text"
+        },
+        {
+          "key": "heater_fan hotend_fan.heater",
+          "section": "heater_fan hotend_fan",
+          "option": "heater",
+          "label": "Hotend fan heater",
+          "type": "text",
+          "placeholder": "extruder"
+        },
+        {
+          "key": "meta.toolhead_entry_to_sensor_measured",
+          "label": "Manual entrance → toolhead sensor (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 0.1,
+          "help": "Physical measurement used for geometry checking; not written to printer.cfg."
+        },
+        {
+          "key": "meta.toolhead_entry_to_nozzle_outside",
+          "label": "Manual entrance → outside nozzle tip (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 0.1,
+          "help": "Reference only. Happy Hare uses the internal nozzle shoulder, not the visible tip."
+        }
+      ]
+    },
+    {
+      "id": "bed_power",
+      "title": "5. Heated bed, fans, and supporting services",
+      "summary": "Bed heater and temperature sensor plus standard Klipper service sections.",
+      "diagram": "printer",
+      "fields": [
+        {
+          "key": "heater_bed.heater_pin",
+          "section": "heater_bed",
+          "option": "heater_pin",
+          "label": "Bed heater pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "heater_bed.sensor_type",
+          "section": "heater_bed",
+          "option": "sensor_type",
+          "label": "Bed sensor type",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "heater_bed.sensor_pin",
+          "section": "heater_bed",
+          "option": "sensor_pin",
+          "label": "Bed sensor pin",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "heater_bed.control",
+          "section": "heater_bed",
+          "option": "control",
+          "label": "Bed control",
+          "type": "select",
+          "options": [
+            "pid",
+            "watermark"
+          ]
+        },
+        {
+          "key": "heater_bed.min_temp",
+          "section": "heater_bed",
+          "option": "min_temp",
+          "label": "Bed minimum temperature",
+          "type": "number",
+          "required": true,
+          "step": 1
+        },
+        {
+          "key": "heater_bed.max_temp",
+          "section": "heater_bed",
+          "option": "max_temp",
+          "label": "Bed maximum temperature",
+          "type": "number",
+          "required": true,
+          "step": 1
+        },
+        {
+          "key": "controller_fan controller_fan.pin",
+          "section": "controller_fan controller_fan",
+          "option": "pin",
+          "label": "Electronics fan pin",
+          "type": "text"
+        },
+        {
+          "key": "virtual_sdcard.path",
+          "section": "virtual_sdcard",
+          "option": "path",
+          "label": "Virtual SD path",
+          "type": "text",
+          "placeholder": "~/printer_data/gcodes"
+        },
+        {
+          "key": "idle_timeout.timeout",
+          "section": "idle_timeout",
+          "option": "timeout",
+          "label": "Idle timeout (seconds)",
+          "type": "number",
+          "min": 1,
+          "step": 1
+        }
+      ]
+    },
+    {
+      "id": "erfc_identity",
+      "title": "6. ERCF / Happy Hare identity",
+      "summary": "Describe the MMU and the controller produced by the Happy Hare installer.",
+      "diagram": "erfc",
+      "fields": [
+        {
+          "key": "mmu_machine.mmu_vendor",
+          "section": "mmu_machine",
+          "option": "mmu_vendor",
+          "label": "MMU vendor",
+          "type": "text",
+          "placeholder": "ERCF"
+        },
+        {
+          "key": "mmu_machine.mmu_version",
+          "section": "mmu_machine",
+          "option": "mmu_version",
+          "label": "MMU version",
+          "type": "text",
+          "placeholder": "2.0"
+        },
+        {
+          "key": "mmu_machine.num_gates",
+          "section": "mmu_machine",
+          "option": "num_gates",
+          "label": "Number of gates",
+          "type": "number",
+          "min": 1,
+          "step": 1
+        },
+        {
+          "key": "mcu mmu.serial",
+          "section": "mcu mmu",
+          "option": "serial",
+          "label": "MMU MCU serial",
+          "type": "text",
+          "placeholder": "/dev/serial/by-id/..."
+        },
+        {
+          "key": "mcu mmu.canbus_uuid",
+          "section": "mcu mmu",
+          "option": "canbus_uuid",
+          "label": "MMU MCU CAN UUID",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "id": "erfc_hardware",
+      "title": "7. ERCF motors, servo, encoder, and sensors",
+      "summary": "Hardware values normally placed in mmu_hardware.cfg.",
+      "diagram": "erfc",
+      "fields": [
+        {
+          "key": "stepper_mmu_gear.step_pin",
+          "section": "stepper_mmu_gear",
+          "option": "step_pin",
+          "label": "Gear step pin",
+          "type": "text"
+        },
+        {
+          "key": "stepper_mmu_gear.dir_pin",
+          "section": "stepper_mmu_gear",
+          "option": "dir_pin",
+          "label": "Gear direction pin",
+          "type": "text"
+        },
+        {
+          "key": "stepper_mmu_gear.enable_pin",
+          "section": "stepper_mmu_gear",
+          "option": "enable_pin",
+          "label": "Gear enable pin",
+          "type": "text"
+        },
+        {
+          "key": "stepper_mmu_gear.rotation_distance",
+          "section": "stepper_mmu_gear",
+          "option": "rotation_distance",
+          "label": "Gear rotation distance",
+          "type": "number",
+          "min": 0.001,
+          "step": 0.0001
+        },
+        {
+          "key": "stepper_mmu_gear.gear_ratio",
+          "section": "stepper_mmu_gear",
+          "option": "gear_ratio",
+          "label": "Gear ratio",
+          "type": "text",
+          "placeholder": "80:20"
+        },
+        {
+          "key": "stepper_mmu_selector.step_pin",
+          "section": "stepper_mmu_selector",
+          "option": "step_pin",
+          "label": "Selector step pin",
+          "type": "text"
+        },
+        {
+          "key": "stepper_mmu_selector.dir_pin",
+          "section": "stepper_mmu_selector",
+          "option": "dir_pin",
+          "label": "Selector direction pin",
+          "type": "text"
+        },
+        {
+          "key": "stepper_mmu_selector.enable_pin",
+          "section": "stepper_mmu_selector",
+          "option": "enable_pin",
+          "label": "Selector enable pin",
+          "type": "text"
+        },
+        {
+          "key": "mmu_servo selector_servo.pin",
+          "section": "mmu_servo selector_servo",
+          "option": "pin",
+          "label": "Selector servo pin",
+          "type": "text"
+        },
+        {
+          "key": "mmu_encoder mmu_encoder.encoder_pin",
+          "section": "mmu_encoder mmu_encoder",
+          "option": "encoder_pin",
+          "label": "Encoder pin",
+          "type": "text"
+        },
+        {
+          "key": "mmu_encoder mmu_encoder.encoder_resolution",
+          "section": "mmu_encoder mmu_encoder",
+          "option": "encoder_resolution",
+          "label": "Encoder resolution",
+          "type": "number",
+          "min": 0.0001,
+          "step": 0.0001
+        },
+        {
+          "key": "mmu_sensors.extruder_switch_pin",
+          "section": "mmu_sensors",
+          "option": "extruder_switch_pin",
+          "label": "Extruder-entry sensor pin",
+          "type": "text"
+        },
+        {
+          "key": "mmu_sensors.toolhead_switch_pin",
+          "section": "mmu_sensors",
+          "option": "toolhead_switch_pin",
+          "label": "Toolhead sensor pin",
+          "type": "text"
+        },
+        {
+          "key": "mmu_sensors.sync_feedback_tension_pin",
+          "section": "mmu_sensors",
+          "option": "sync_feedback_tension_pin",
+          "label": "Tension sensor pin",
+          "type": "text"
+        },
+        {
+          "key": "mmu_sensors.sync_feedback_compression_pin",
+          "section": "mmu_sensors",
+          "option": "sync_feedback_compression_pin",
+          "label": "Compression sensor pin",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "id": "erfc_parameters",
+      "title": "8. Happy Hare geometry and operating parameters",
+      "summary": "Calibration results and operating limits normally placed in mmu_parameters.cfg.",
+      "diagram": "erfc",
+      "fields": [
+        {
+          "key": "mmu_parameters.servo_up_angle",
+          "section": "mmu_parameters",
+          "option": "servo_up_angle",
+          "label": "Servo up angle",
+          "type": "number",
+          "step": 0.1
+        },
+        {
+          "key": "mmu_parameters.servo_down_angle",
+          "section": "mmu_parameters",
+          "option": "servo_down_angle",
+          "label": "Servo down angle",
+          "type": "number",
+          "step": 0.1
+        },
+        {
+          "key": "mmu_parameters.gate_homing_max",
+          "section": "mmu_parameters",
+          "option": "gate_homing_max",
+          "label": "Gate homing maximum (mm)",
+          "type": "number",
+          "min": 1,
+          "step": 0.1
+        },
+        {
+          "key": "mmu_parameters.gate_parking_distance",
+          "section": "mmu_parameters",
+          "option": "gate_parking_distance",
+          "label": "Gate parking distance (mm)",
+          "type": "number",
+          "step": 0.1
+        },
+        {
+          "key": "mmu_parameters.calibrated_bowden_length",
+          "section": "mmu_parameters",
+          "option": "calibrated_bowden_length",
+          "label": "Calibrated Bowden length (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 0.1
+        },
+        {
+          "key": "mmu_parameters.extruder_homing_endstop",
+          "section": "mmu_parameters",
+          "option": "extruder_homing_endstop",
+          "label": "Extruder homing endstop",
+          "type": "select",
+          "options": [
+            "collision",
+            "extruder",
+            "toolhead",
+            "none"
+          ]
+        },
+        {
+          "key": "mmu_parameters.toolhead_entry_to_extruder",
+          "section": "mmu_parameters",
+          "option": "toolhead_entry_to_extruder",
+          "label": "Entry sensor to extruder gears (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 0.1
+        },
+        {
+          "key": "mmu_parameters.toolhead_extruder_to_nozzle",
+          "section": "mmu_parameters",
+          "option": "toolhead_extruder_to_nozzle",
+          "label": "Extruder gears to internal nozzle shoulder (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 0.1
+        },
+        {
+          "key": "mmu_parameters.toolhead_sensor_to_nozzle",
+          "section": "mmu_parameters",
+          "option": "toolhead_sensor_to_nozzle",
+          "label": "Toolhead sensor to internal nozzle shoulder (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 0.1
+        },
+        {
+          "key": "mmu_parameters.flowguard_encoder_max_motion",
+          "section": "mmu_parameters",
+          "option": "flowguard_encoder_max_motion",
+          "label": "FlowGuard encoder maximum motion (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 0.1
+        },
+        {
+          "key": "mmu_parameters.gear_from_buffer_speed",
+          "section": "mmu_parameters",
+          "option": "gear_from_buffer_speed",
+          "label": "Gear from buffer speed (mm/s)",
+          "type": "number",
+          "min": 0.1,
+          "step": 0.1
+        },
+        {
+          "key": "mmu_parameters.gear_unload_speed",
+          "section": "mmu_parameters",
+          "option": "gear_unload_speed",
+          "label": "Gear unload speed (mm/s)",
+          "type": "number",
+          "min": 0.1,
+          "step": 0.1
+        },
+        {
+          "key": "mmu_parameters.endless_spool_enabled",
+          "section": "mmu_parameters",
+          "option": "endless_spool_enabled",
+          "label": "EndlessSpool enabled",
+          "type": "select",
+          "options": [
+            "0",
+            "1"
+          ]
+        },
+        {
+          "key": "mmu_parameters.purge_macro",
+          "section": "mmu_parameters",
+          "option": "purge_macro",
+          "label": "Happy Hare purge macro",
+          "type": "text",
+          "placeholder": "BLOBIFIER"
+        },
+        {
+          "key": "mmu_parameters.force_purge_standalone",
+          "section": "mmu_parameters",
+          "option": "force_purge_standalone",
+          "label": "Force standalone purging",
+          "type": "select",
+          "options": [
+            "0",
+            "1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "blobifier_hardware",
+      "title": "9. Blobifier hardware and wiring",
+      "description": "Use the Blobifier files shipped with the installed Happy Hare version. Confirm board documentation before selecting pins.",
+      "diagram": "blobifier",
+      "fields": [
+        {
+          "key": "meta.blobifier_printer_size",
+          "label": "Printer size / Blobifier variant",
+          "type": "text",
+          "placeholder": "Voron V2.4 350 rear-left"
+        },
+        {
+          "key": "meta.blobifier_brush_source",
+          "label": "Brush installation",
+          "type": "select",
+          "options": [
+            "Reuse existing brush",
+            "Install Blobifier brush",
+            "Gantry-mounted brush",
+            "Other"
+          ]
+        },
+        {
+          "key": "mmu_servo blobifier.pin",
+          "section": "mmu_servo blobifier",
+          "option": "pin",
+          "label": "Blobifier servo signal pin",
+          "type": "text",
+          "help": "Servo-capable output pin. Verify voltage and pin capability from the controller documentation."
+        },
+        {
+          "key": "mmu_servo blobifier.minimum_pulse_width",
+          "section": "mmu_servo blobifier",
+          "option": "minimum_pulse_width",
+          "label": "Servo minimum pulse width",
+          "type": "number",
+          "min": 0.0001,
+          "max": 0.004,
+          "step": 1e-05
+        },
+        {
+          "key": "mmu_servo blobifier.maximum_pulse_width",
+          "section": "mmu_servo blobifier",
+          "option": "maximum_pulse_width",
+          "label": "Servo maximum pulse width",
+          "type": "number",
+          "min": 0.0001,
+          "max": 0.004,
+          "step": 1e-05
+        },
+        {
+          "key": "mmu_servo blobifier.maximum_servo_angle",
+          "section": "mmu_servo blobifier",
+          "option": "maximum_servo_angle",
+          "label": "Maximum servo angle",
+          "type": "number",
+          "min": 1,
+          "max": 360,
+          "step": 1
+        },
+        {
+          "key": "gcode_button bucket.pin",
+          "section": "gcode_button bucket",
+          "option": "pin",
+          "label": "Bucket switch pin",
+          "type": "text",
+          "placeholder": "^PG15",
+          "help": "The official example uses an input pull-up prefix (^). Confirm the electrical logic on your board."
+        }
+      ]
+    },
+    {
+      "id": "blobifier_geometry",
+      "title": "10. Blobifier tray, brush, and motion geometry",
+      "description": "Start with generous clearances and approach the tray and brush from above. Values belong to [gcode_macro BLOBIFIER].",
+      "diagram": "blobifier",
+      "fields": [
+        {
+          "key": "gcode_macro BLOBIFIER.variable_toolhead_x",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_toolhead_x",
+          "label": "Nozzle to left toolhead edge (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 0.1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_toolhead_y",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_toolhead_y",
+          "label": "Nozzle to front toolhead edge (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 0.1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_brush_start",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_brush_start",
+          "label": "Brush start X (mm)",
+          "type": "number",
+          "step": 0.1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_brush_width",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_brush_width",
+          "label": "Brush width (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 0.1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_brush_top",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_brush_top",
+          "label": "Brush top Z (mm or None)",
+          "type": "text",
+          "placeholder": "6"
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_brush_y_offset",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_brush_y_offset",
+          "label": "Brush Y offset (mm)",
+          "type": "number",
+          "step": 0.1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_clearance_z",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_clearance_z",
+          "label": "Travel clearance above brush (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 0.1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_purge_x",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_purge_x",
+          "label": "Tray purge X (mm)",
+          "type": "number",
+          "step": 0.1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_tray_top",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_tray_top",
+          "label": "Tray top relative to bed Z (mm)",
+          "type": "number",
+          "step": 0.05
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_y_offset",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_y_offset",
+          "label": "Purge Y offset from Y maximum (mm)",
+          "type": "number",
+          "step": 0.1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_force_safe_descend_height_until",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_force_safe_descend_height_until",
+          "label": "Force-safe-descend height limit (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 0.1,
+          "help": "Below this estimated print height, Blobifier may allow its configured safe descend. Keep a safety margin."
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_travel_spd_xy",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_travel_spd_xy",
+          "label": "XY travel speed (mm/min)",
+          "type": "number",
+          "min": 1,
+          "step": 100
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_travel_spd_z",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_travel_spd_z",
+          "label": "Z travel speed (mm/min)",
+          "type": "number",
+          "min": 1,
+          "step": 50
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_wipe_spd_xy",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_wipe_spd_xy",
+          "label": "Brush wipe speed (mm/min)",
+          "type": "number",
+          "min": 1,
+          "step": 100
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_brush_accel",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_brush_accel",
+          "label": "Brush acceleration (mm/s²)",
+          "type": "number",
+          "min": 0,
+          "step": 100
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_skew_correction",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_skew_correction",
+          "label": "Blobifier skew correction (mm)",
+          "type": "number",
+          "step": 0.05
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_shaker_pos_x",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_shaker_pos_x",
+          "label": "Shaker X offset (mm)",
+          "type": "number",
+          "step": 0.1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_shake_accel",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_shake_accel",
+          "label": "Shaker acceleration (mm/s²)",
+          "type": "number",
+          "min": 0,
+          "step": 100
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_tray_angle_out",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_tray_angle_out",
+          "label": "Tray-out servo angle",
+          "type": "number",
+          "min": 0,
+          "max": 360,
+          "step": 1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_tray_angle_in",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_tray_angle_in",
+          "label": "Tray-in servo angle",
+          "type": "number",
+          "min": 0,
+          "max": 360,
+          "step": 1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_dwell_time",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_dwell_time",
+          "label": "Servo dwell time (ms)",
+          "type": "number",
+          "min": 0,
+          "step": 10
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_wipe_qty",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_wipe_qty",
+          "label": "Complete brush wipes",
+          "type": "number",
+          "min": 0,
+          "step": 1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_shaker_arm_z",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_shaker_arm_z",
+          "label": "Shaker-arm Z height (mm)",
+          "type": "number",
+          "step": 0.1
+        }
+      ]
+    },
+    {
+      "id": "blobifier_tuning",
+      "title": "11. Blobifier purge, blob, and bucket tuning",
+      "description": "Tune only after servo, switch, geometry, and dry-motion tests pass. Values belong to [gcode_macro BLOBIFIER].",
+      "diagram": "blobifier",
+      "fields": [
+        {
+          "key": "gcode_macro BLOBIFIER.variable_purge_spd",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_purge_spd",
+          "label": "Purge speed (mm/min)",
+          "type": "number",
+          "min": 1,
+          "step": 1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_purge_temp_min",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_purge_temp_min",
+          "label": "Minimum purge temperature (°C)",
+          "type": "number",
+          "min": 0,
+          "max": 350,
+          "step": 1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_purge_start",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_purge_start",
+          "label": "Purge start height above tray (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 0.05
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_z_raise",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_z_raise",
+          "label": "Total Z raise per blob (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 0.1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_z_raise_exp",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_z_raise_exp",
+          "label": "Z raise exponent",
+          "type": "number",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.01
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_eject_hop",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_eject_hop",
+          "label": "Blob eject hop (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 0.1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_pressure_release_time",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_pressure_release_time",
+          "label": "Pressure-release dwell (ms)",
+          "type": "number",
+          "min": 0,
+          "step": 50
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_retract_between_blobs",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_retract_between_blobs",
+          "label": "Retraction between blobs (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 0.1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_purge_length_minimum",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_purge_length_minimum",
+          "label": "Minimum purge length (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_purge_length_maximum",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_purge_length_maximum",
+          "label": "Maximum purge per blob (mm)",
+          "type": "number",
+          "min": 1,
+          "step": 1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_purge_length",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_purge_length",
+          "label": "Default purge length (mm)",
+          "type": "number",
+          "min": 0,
+          "step": 1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_purge_length_modifier",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_purge_length_modifier",
+          "label": "Purge-length modifier",
+          "type": "number",
+          "min": 0,
+          "step": 0.01
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_purge_length_addition",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_purge_length_addition",
+          "label": "Fixed purge-length addition (mm)",
+          "type": "number",
+          "step": 1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_max_blobs",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_max_blobs",
+          "label": "Bucket maximum blob count",
+          "type": "number",
+          "min": 1,
+          "step": 1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_enable_shaker",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_enable_shaker",
+          "label": "Enable bucket shaker",
+          "type": "select",
+          "options": [
+            "0",
+            "1"
+          ]
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_bucket_shakes",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_bucket_shakes",
+          "label": "Motions per shake",
+          "type": "number",
+          "min": 1,
+          "step": 1
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_bucket_shake_frequency",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_bucket_shake_frequency",
+          "label": "Bucket-shake frequency factor",
+          "type": "number",
+          "min": 0,
+          "max": 1,
+          "step": 0.01
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_part_cooling_fan",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_part_cooling_fan",
+          "label": "Fan speed while purging (-1 to 1)",
+          "type": "number",
+          "min": -1,
+          "max": 1,
+          "step": 0.05
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_part_cooling_fan_blob_deposit",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_part_cooling_fan_blob_deposit",
+          "label": "Fan speed while depositing (-1 to 1)",
+          "type": "number",
+          "min": -1,
+          "max": 1,
+          "step": 0.05
+        },
+        {
+          "key": "gcode_macro BLOBIFIER.variable_fan_name",
+          "section": "gcode_macro BLOBIFIER",
+          "option": "variable_fan_name",
+          "label": "Alternate part-cooling fan object",
+          "type": "text",
+          "placeholder": "fan_generic fan0",
+          "help": "Leave blank to use the normal [fan]."
+        }
+      ]
+    }
+  ]
+}

@@ -32,7 +32,7 @@ fi
 systemctl stop "${SERVICE_NAME}" 2>/dev/null || true
 systemctl stop "${OLD_SERVICE}" 2>/dev/null || true
 
-mkdir -p "${LOCAL_DIR}/data"
+mkdir -p "${LOCAL_DIR}/data" "${LOCAL_DIR}/backups"
 
 # Migrate user settings and records from the ZIP-installed v0.1.0 layout.
 if [[ -d "${OLD_DIR}" ]]; then

@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "source": "https://ellis3dp.com/Print-Tuning-Guide/",
+  "title": "Ellis-style printer tuning path",
+  "steps": [
+    {"id": "ellis_preflight", "title": "Mechanical and safety preflight", "summary": "Square the gantry where applicable, tighten hardware, verify clean motion components, correct thermistors, a clean nozzle, and a hot-tightened leak-free hotend.", "kind": "confirm"},
+    {"id": "ellis_baseline", "title": "Capture a known-good baseline", "summary": "Import the working configuration or capture the live Klipper configuration before changes.", "kind": "config"},
+    {"id": "ellis_extruder", "title": "Calibrate extruder rotation distance", "summary": "Command a known filament length, measure actual movement, calculate rotation_distance, repeat, and only then save.", "kind": "calibration"},
+    {"id": "ellis_surface", "title": "Prepare the build surface", "summary": "Confirm the correct plate, cleaning method, material temperature, and adhesion condition.", "kind": "confirm"},
+    {"id": "ellis_first_layer", "title": "Tune first-layer squish", "summary": "Complete rough Z calibration, print a suitable patch, live-adjust the first layer, then save the verified offset.", "kind": "print"},
+    {"id": "ellis_pa", "title": "Tune pressure advance", "summary": "Run the appropriate pressure-advance pattern after extruder calibration and record the filament-specific value.", "kind": "print"},
+    {"id": "ellis_em", "title": "Tune extrusion multiplier", "summary": "Use a controlled print and visual surface evaluation; store the result with the filament profile rather than as universal hardware truth.", "kind": "print"},
+    {"id": "ellis_cooling", "title": "Tune cooling and layer time", "summary": "Choose stable fan behaviour and minimum layer time for the material and enclosure conditions.", "kind": "print"},
+    {"id": "ellis_retraction", "title": "Tune retraction only after pressure advance", "summary": "Start conservatively, look for other causes of stringing, and avoid excessive direct-drive retraction.", "kind": "print"},
+    {"id": "ellis_overlap", "title": "Tune infill/perimeter overlap and stepover", "summary": "Finish slicer-specific overlap and top-surface settings after flow is stable.", "kind": "print"},
+    {"id": "ellis_advanced", "title": "Optional advanced limits", "summary": "Determine maximum volumetric flow, safe motor currents, speeds, and accelerations; use production values below synthetic limits.", "kind": "advanced"},
+    {"id": "ellis_endurance", "title": "Progressive endurance verification", "summary": "Pass a short calibration print, a medium print, and a representative endurance print before trusting a 36-hour job.", "kind": "verification"}
+  ]
+}

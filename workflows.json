@@ -1,6 +1,60 @@
 {
-  "version": 1,
+  "version": 3,
   "workflows": [
+    {
+      "id": "config_builder",
+      "section": "Configuration builder",
+      "title": "Build and review Klipper configuration",
+      "summary": "Import known-good .cfg files, complete guided printer, ERCF, and Blobifier fields, preserve advanced sections, preview diffs, back up, and apply with rollback.",
+      "status": "ready",
+      "steps": [
+        {
+          "id": "import",
+          "title": "Import or start blank",
+          "kind": "config",
+          "instructions": "Import one or more known-good Klipper or Happy Hare files, or begin a new draft."
+        },
+        {
+          "id": "guided",
+          "title": "Complete guided hardware variables",
+          "kind": "config",
+          "instructions": "Use the printer, toolhead, and ERCF diagrams to fill required values."
+        },
+        {
+          "id": "advanced",
+          "title": "Review every preserved section",
+          "kind": "review",
+          "instructions": "Inspect board-specific pins, drivers, macros, additional steppers, and unknown options."
+        },
+        {
+          "id": "export",
+          "title": "Preview, back up, and apply or export",
+          "kind": "export",
+          "instructions": "Inspect every changed file. GKCC creates a backup before live updates and can export a review ZIP."
+        }
+      ]
+    },
+    {
+      "id": "ellis_tuning_path",
+      "section": "Ellis tuning path",
+      "title": "Complete Ellis-style tuning sequence",
+      "summary": "Track mechanical preflight, extruder calibration, first layer, pressure advance, flow, cooling, retraction, and endurance verification.",
+      "status": "ready"
+    },
+    {
+      "id": "erfc_guided_setup",
+      "section": "ERCF / Happy Hare",
+      "title": "Complete guided ERCF setup and calibration",
+      "summary": "Track official installer output, hardware checks, selector, gear, encoder, cold pull, toolhead, Bowden, gates, load/unload, FlowGuard, and endurance tests.",
+      "status": "ready"
+    },
+    {
+      "id": "blobifier_guided_setup",
+      "section": "Blobifier",
+      "title": "Install and commission Blobifier",
+      "summary": "Import the current Happy Hare addon files, verify wiring, test bucket switch and servo, measure tray/brush geometry, create a supervised first blob, tune, back up, and apply live.",
+      "status": "ready"
+    },
     {
       "id": "printer_snapshot",
       "section": "Printer baseline",
@@ -8,9 +62,24 @@
       "summary": "Read the live Klipper configuration and save an as-built snapshot for the final manual.",
       "status": "ready",
       "steps": [
-        {"id": "connect", "title": "Confirm connection", "kind": "check", "instructions": "Klipper must report Ready. No machine movement is performed."},
-        {"id": "capture", "title": "Capture configuration", "kind": "snapshot", "instructions": "Save the current Klipper configuration and relevant live status to the calibration record."},
-        {"id": "notes", "title": "Add baseline notes", "kind": "text", "instructions": "Record recent repairs, modifications, or known issues."}
+        {
+          "id": "connect",
+          "title": "Confirm connection",
+          "kind": "check",
+          "instructions": "Klipper must report Ready. No machine movement is performed."
+        },
+        {
+          "id": "capture",
+          "title": "Capture configuration",
+          "kind": "snapshot",
+          "instructions": "Save the current Klipper configuration and relevant live status to the calibration record."
+        },
+        {
+          "id": "notes",
+          "title": "Add baseline notes",
+          "kind": "text",
+          "instructions": "Record recent repairs, modifications, or known issues."
+        }
       ]
     },
     {
@@ -21,12 +90,45 @@
       "status": "ready",
       "safety": "Only run while the printer is idle. Heat the nozzle before pushing filament through the nozzle. Keep hands clear of gears and the cutter.",
       "steps": [
-        {"id": "prepare", "title": "Prepare the toolhead", "kind": "checklist", "instructions": "Start with the correct gate selected. For physical geometry, use a clean/cold-pulled toolhead. Lock the tension/compression mechanism during Happy Hare geometry measurements."},
-        {"id": "sensor_entry", "title": "Mark extruder-entry sensor", "kind": "motion_mark", "marker": "extruder_entry", "instructions": "Advance slowly until the entry sensor changes state, then mark the position."},
-        {"id": "sensor_toolhead", "title": "Mark post-extruder toolhead sensor", "kind": "motion_mark", "marker": "toolhead_sensor", "instructions": "Continue through the extruder gears until the toolhead sensor changes state, then mark the position."},
-        {"id": "steady_extrusion", "title": "Mark first steady extrusion", "kind": "motion_mark_hot", "marker": "first_steady_extrusion", "instructions": "Heat for the selected filament. Advance in small steps and mark the first continuous strand—not the first drool."},
-        {"id": "repeat", "title": "Repeat and compare", "kind": "repeat", "instructions": "Run the measurement at least three times. The report will show the average and spread."},
-        {"id": "review", "title": "Review results", "kind": "review", "instructions": "Compare measured values with current Happy Hare settings. This release records recommendations but does not edit configuration files."}
+        {
+          "id": "prepare",
+          "title": "Prepare the toolhead",
+          "kind": "checklist",
+          "instructions": "Start with the correct gate selected. For physical geometry, use a clean/cold-pulled toolhead. Lock the tension/compression mechanism during Happy Hare geometry measurements."
+        },
+        {
+          "id": "sensor_entry",
+          "title": "Mark extruder-entry sensor",
+          "kind": "motion_mark",
+          "marker": "extruder_entry",
+          "instructions": "Advance slowly until the entry sensor changes state, then mark the position."
+        },
+        {
+          "id": "sensor_toolhead",
+          "title": "Mark post-extruder toolhead sensor",
+          "kind": "motion_mark",
+          "marker": "toolhead_sensor",
+          "instructions": "Continue through the extruder gears until the toolhead sensor changes state, then mark the position."
+        },
+        {
+          "id": "steady_extrusion",
+          "title": "Mark first steady extrusion",
+          "kind": "motion_mark_hot",
+          "marker": "first_steady_extrusion",
+          "instructions": "Heat for the selected filament. Advance in small steps and mark the first continuous strand\u2014not the first drool."
+        },
+        {
+          "id": "repeat",
+          "title": "Repeat and compare",
+          "kind": "repeat",
+          "instructions": "Run the measurement at least three times. The report will show the average and spread."
+        },
+        {
+          "id": "review",
+          "title": "Review results",
+          "kind": "review",
+          "instructions": "Compare measured values with current Happy Hare settings. This release records recommendations but does not edit configuration files."
+        }
       ]
     },
     {
@@ -36,9 +138,24 @@
       "summary": "Record outgoing/incoming filament pairs and the first visually clean stepped purge sample.",
       "status": "planned",
       "steps": [
-        {"id": "pair", "title": "Choose transition", "kind": "pair", "instructions": "Select outgoing and incoming filament profiles."},
-        {"id": "samples", "title": "Produce stepped samples", "kind": "planned", "instructions": "A later release will generate numbered purge tiles or strips."},
-        {"id": "select", "title": "Select first clean sample", "kind": "planned", "instructions": "Choose the first clean sample and apply a safety margin."}
+        {
+          "id": "pair",
+          "title": "Choose transition",
+          "kind": "pair",
+          "instructions": "Select outgoing and incoming filament profiles."
+        },
+        {
+          "id": "samples",
+          "title": "Produce stepped samples",
+          "kind": "planned",
+          "instructions": "A later release will generate numbered purge tiles or strips."
+        },
+        {
+          "id": "select",
+          "title": "Select first clean sample",
+          "kind": "planned",
+          "instructions": "Choose the first clean sample and apply a safety margin."
+        }
       ]
     }
   ]

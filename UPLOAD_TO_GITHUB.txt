@@ -1,25 +1,30 @@
-GKCC GITHUB UPLOAD STEPS
-========================
+GKCC v0.4.0 GITHUB UPDATE STEPS
+================================
 
 IMPORTANT: Do not upload this ZIP as one file and stop there. GitHub will store
 it as a ZIP; it will not unpack it into the repository, and Moonraker cannot
 update the application that way.
 
-1. Extract GKCC_GitHub_Upload_v0.1.1.zip on your Windows PC.
+1. Extract GKCC_GitHub_Upload_v0.4.0.zip on your Windows PC.
 2. Open the extracted "GKCC-upload" folder.
 3. Open https://github.com/thatmanyouknow/GKCC in your browser.
 4. Click Add file -> Upload files.
 5. Drag ALL CONTENTS from inside GKCC-upload into the upload page.
-   README.md, install.sh, calibration_center.py, and the other files must appear
-   at the root of the repository. Do not leave them inside another folder.
+   README.md, install.sh, calibration_center.py, index.html, and the JSON guide
+   files must appear at the root of the repository. Do not leave them inside
+   another folder.
 6. Use this commit message:
-       Initial GKCC Calibration Center v0.1.1
+       Add guided Blobifier commissioning v0.4.0
 7. Commit directly to the main branch.
 8. On the Releases or Tags page, create tag:
-       v0.1.1
+       v0.4.0
 
-FIRST INSTALL ON THE PRINTER
-============================
+UPDATE THE PRINTER
+==================
+
+In Mainsail, open Update Manager and press Update beside gkcc.
+
+If this is the first installation instead:
 
 cd ~
 git clone https://github.com/thatmanyouknow/GKCC.git
@@ -29,9 +34,32 @@ sudo bash install.sh
 Open:
 http://mainsailos.local:7128
 
-FUTURE REVISIONS
+WHAT v0.4.0 ADDS
 ================
 
-Upload changed files to GitHub and commit them. Then use Mainsail Update Manager
-and press Update beside gkcc. Do not upload replacement ZIP files to the repo as
-the update method.
+- Load/rebase the builder from live printer.cfg and Happy Hare user files.
+- Preserve raw comments, macros, formatting, and continuation lines.
+- Preview exact unified diffs before a live write.
+- Block stale-baseline overwrites and writes during active/paused prints.
+- Back up every changed file into a downloadable ZIP before upload.
+- Apply changed .cfg files through Moonraker after PIN unlock and typed APPLY.
+- Optionally restart Klipper and validate that it returns ready.
+- Automatically restore the backup if Klipper rejects the proposed config.
+- Browse, download, and restore old configuration backups.
+- Create another safety backup before a manual restore.
+
+LIVE-APPLY FIRST USE
+====================
+
+1. Open Configuration builder -> Start / import.
+2. Unlock controls.
+3. Press Load/rebase live files.
+4. Make or review the guided changes.
+5. Open Review / export, then Live apply.
+6. Press Preview changed files and inspect every diff.
+7. Type APPLY and press Back up and apply live.
+
+The backup protects file recovery. It does not prove that electrical pins,
+thermistors, currents, heater limits, or movement values are safe.
+
+- Dedicated Blobifier setup, geometry, dry-run, test-blob, tuning, backup, and live-apply workflow.

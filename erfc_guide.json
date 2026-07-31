@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "source": "https://github.com/moggieuk/Happy-Hare/wiki",
+  "title": "ERCF / Happy Hare setup path",
+  "steps": [
+    {"id": "erfc_install", "title": "Install Happy Hare and create official base files", "summary": "Use the Happy Hare interactive installer for MMU type, gate count, controller, selector-touch choice, LEDs, servo, clog detection, EndlessSpool, and printer.cfg includes.", "kind": "config"},
+    {"id": "erfc_import", "title": "Import the generated user-editable files", "summary": "Load mmu.cfg, mmu_hardware.cfg, mmu_parameters.cfg, and mmu_macro_vars.cfg so GKCC can preserve every existing value and comment on missing essentials.", "kind": "config"},
+    {"id": "erfc_wiring", "title": "Verify motors, servo, encoder, and sensors", "summary": "Confirm pin assignments and live states before automatic movement.", "kind": "confirm"},
+    {"id": "erfc_selector", "title": "Calibrate selector positions", "summary": "Calibrate all selector gates, then verify individual gate alignment before loading filament.", "kind": "calibration"},
+    {"id": "erfc_gear", "title": "Calibrate gear rotation distance", "summary": "Use a measured filament length and save only after the physical result repeats.", "kind": "calibration"},
+    {"id": "erfc_encoder", "title": "Calibrate and validate the encoder", "summary": "Use a long move and repeated passes; compare load and unload counts and test over the intended speed range.", "kind": "calibration"},
+    {"id": "erfc_cold_pull", "title": "Clean the nozzle with a guided cold pull", "summary": "Follow the material-specific macro and leave the toolhead empty for clean geometry calibration.", "kind": "calibration"},
+    {"id": "erfc_toolhead", "title": "Calibrate clean toolhead dimensions", "summary": "Measure entry sensor to gears, gears to internal nozzle shoulder, and toolhead sensor to internal nozzle shoulder. Lock any moving filament buffer during geometry measurement.", "kind": "calibration"},
+    {"id": "erfc_bowden", "title": "Calibrate Bowden length", "summary": "Use gate 0 and the best available extruder homing point; compare repeated non-saving runs before saving.", "kind": "calibration"},
+    {"id": "erfc_gates", "title": "Optionally calibrate individual gates", "summary": "Calibrate gate-specific movement only after gate 0 gear, encoder, toolhead, and Bowden values are correct.", "kind": "calibration"},
+    {"id": "erfc_load", "title": "Controlled load and unload verification", "summary": "Heat appropriately, observe sensors and encoder, inspect cutter/tip formation, and record commanded versus measured movement.", "kind": "verification"},
+    {"id": "erfc_flowguard", "title": "Set FlowGuard and long-print features", "summary": "Apply the measured clog-detection recommendation, verify EndlessSpool mappings, and test backup gates before long prints.", "kind": "verification"},
+    {"id": "erfc_endurance", "title": "Run representative tool-change endurance tests", "summary": "Increase from a few swaps to a long repeat test while tracking failures by gate and stage.", "kind": "verification"}
+  ]
+}

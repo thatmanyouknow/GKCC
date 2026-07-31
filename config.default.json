@@ -4,5 +4,7 @@
   "screen_pin": "1830",
   "poll_seconds": 1.0,
   "printer_name": "Voron V2.1830",
-  "allow_machine_actions": true
+  "allow_machine_actions": true,
+  "allow_live_config_writes": true,
+  "live_restart_timeout_seconds": 45
 }
