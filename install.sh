@@ -34,6 +34,17 @@ systemctl stop "${OLD_SERVICE}" 2>/dev/null || true
 
 mkdir -p "${LOCAL_DIR}/data" "${LOCAL_DIR}/backups" "${LOCAL_DIR}/app-backups"
 
+# Remove obsolete untracked artifacts without making a Git checkout dirty. A
+# tracked artifact must be deleted in GitHub so the updater can remove it cleanly.
+if [[ -e "${SOURCE_DIR}/download" ]]; then
+  if git -C "${SOURCE_DIR}" ls-files --error-unmatch download >/dev/null 2>&1; then
+    echo "NOTICE: tracked obsolete file 'download' remains; delete it from the GitHub repository in the same v0.5.1 commit."
+  else
+    rm -rf "${SOURCE_DIR}/download"
+    echo "Removed obsolete untracked artifact: download"
+  fi
+fi
+
 # Preserve the currently installed application files before service/install changes.
 if [[ -f "${SOURCE_DIR}/VERSION" ]]; then
   APP_BACKUP="${LOCAL_DIR}/app-backups/gkcc-app-$(date +%Y%m%d-%H%M%S).tar.gz"
@@ -128,7 +139,7 @@ if ! systemctl is-active --quiet "${SERVICE_NAME}"; then
 fi
 
 echo
-echo "GKCC Calibration Center v0.5.0 installed."
+echo "GKCC Calibration Center v0.5.1 installed."
 echo "Open: http://mainsailos.local:7128"
 echo "Local data: ${LOCAL_DIR}"
 echo "Service: sudo systemctl status gkcc"

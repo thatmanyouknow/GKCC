@@ -212,3 +212,9 @@ The uninstaller removes the service and updater entry but preserves local record
 ### Guided section aliases
 
 GKCC can populate and edit equivalent Klipper layouts such as `[heater_fan controller_fan]` and `[controller_fan controller_fan]` without creating a duplicate section.
+
+## Protected updater-managed configuration files
+
+GKCC v0.5.1 inspects the real filesystem target behind each live `.cfg` path. Files linked into repositories such as Happy Hare, Mainsail config, KAMP, Timelapse, or Obico are loaded for context but marked read-only. Their diffs remain visible, but live apply is blocked before backup or upload. Edit the package's supported user configuration file or use its installer/update workflow instead of replacing core linked files.
+
+On upload failure, GKCC records the exact filename and Moonraker response and restores only files successfully written by that transaction.

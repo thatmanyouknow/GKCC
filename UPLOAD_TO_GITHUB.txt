@@ -1,11 +1,10 @@
-GKCC v0.5.0 CLEAN CONSOLIDATION UPDATE
-======================================
+GKCC v0.5.1 PROTECTED-PATH SAFETY UPDATE
+==========================================
 
-This release repairs the mixed filenames that caused the browser flatMap error.
 Upload ALL CONTENTS from inside GKCC-upload directly into the repository root.
 Do not upload the ZIP as a single repository file.
 
-1. Extract GKCC_GitHub_Upload_v0.5.0.zip on Windows.
+1. Extract GKCC_GitHub_Upload_v0.5.1.zip on Windows.
 2. Open the extracted GKCC-upload folder.
 3. Open https://github.com/thatmanyouknow/GKCC and select the main branch.
 4. Click Add file -> Upload files.
@@ -24,14 +23,22 @@ Do not upload the ZIP as a single repository file.
      install.sh
      SHA256SUMS
 7. Commit directly to main with:
-     Consolidate and repair GKCC v0.5.0
-8. On the repository Code page, delete the obsolete tracked item named "download"
-   if it is still present. Also delete a tracked __pycache__ folder if GitHub shows it.
-9. In Mainsail Update Manager, update gkcc.
-10. Restart the gkcc service if Update Manager does not do it automatically.
-11. Refresh the browser with Ctrl+F5.
-12. Open Installation health. Every critical component should show OK before
+     Protect updater-managed cfg files and improve rollback v0.5.1
+8. GitHub's web uploader cannot delete old tracked files. On the repository Code
+   page, delete the obsolete root item named "download" if it is still present.
+   Also delete a tracked __pycache__ folder if GitHub shows one. Commit that
+   cleanup to main before creating the v0.5.1 release/tag.
+9. Create/publish the GitHub release tag v0.5.1 targeting main.
+10. In Mainsail Update Manager, update gkcc.
+11. Restart the gkcc service if Update Manager does not do it automatically.
+12. Refresh the browser with Ctrl+F5.
+13. Open Installation health. Every critical component should show OK before
     using Live apply or restoring a configuration backup.
+14. Open Configuration builder and choose Reload live clean once. This clears
+    stale draft cfg edits from the failed v0.5.0 transaction while preserving
+    workflow progress, notes, and taught positions.
+15. Preview changed files. Happy Hare core symlinks should appear read-only if
+    a draft still attempts to change them, and Apply must remain blocked.
 
 If Installation health reports a mismatch, do not use Live apply. The page will
 identify the exact missing, corrupt, or wrong-version file.
