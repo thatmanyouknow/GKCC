@@ -1,10 +1,10 @@
-GKCC v0.5.1 PROTECTED-PATH SAFETY UPDATE
+GKCC v0.5.2 PROTECTED-PATH SAFETY UPDATE
 ==========================================
 
 Upload ALL CONTENTS from inside GKCC-upload directly into the repository root.
 Do not upload the ZIP as a single repository file.
 
-1. Extract GKCC_GitHub_Upload_v0.5.1.zip on Windows.
+1. Extract GKCC_GitHub_Upload_v0.5.2.zip on Windows.
 2. Open the extracted GKCC-upload folder.
 3. Open https://github.com/thatmanyouknow/GKCC and select the main branch.
 4. Click Add file -> Upload files.
@@ -23,12 +23,12 @@ Do not upload the ZIP as a single repository file.
      install.sh
      SHA256SUMS
 7. Commit directly to main with:
-     Protect updater-managed cfg files and improve rollback v0.5.1
+     Protect updater-managed cfg files and improve rollback v0.5.2
 8. GitHub's web uploader cannot delete old tracked files. On the repository Code
    page, delete the obsolete root item named "download" if it is still present.
    Also delete a tracked __pycache__ folder if GitHub shows one. Commit that
-   cleanup to main before creating the v0.5.1 release/tag.
-9. Create/publish the GitHub release tag v0.5.1 targeting main.
+   cleanup to main before creating the v0.5.2 release/tag.
+9. Create/publish the GitHub release tag v0.5.2 targeting main.
 10. In Mainsail Update Manager, update gkcc.
 11. Restart the gkcc service if Update Manager does not do it automatically.
 12. Refresh the browser with Ctrl+F5.

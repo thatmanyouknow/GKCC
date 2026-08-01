@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""GKCC Calibration Center v0.5.1.
+"""GKCC Calibration Center v0.5.2.
 
 A small local web service for guided Klipper and Happy Hare calibration.
 The first release is intentionally conservative: it reads status, sends a
 small allow-listed set of calibration actions, records operator results, and
-produces a printable as-built HTML report. Version 0.5.1 adds protected-path discovery, changed-file-only transaction enforcement, and precise rollback/error reporting.
+produces a printable as-built HTML report. Version 0.5.2 consolidates the protected-path safety work and adds coordinated-release validation before installation.
 """
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 APP_DIR = Path(__file__).resolve().parent
-APP_VERSION = "0.5.1"
+APP_VERSION = "0.5.2"
 VERSION_PATH = APP_DIR / "VERSION"
 RELEASE_MANIFEST_PATH = APP_DIR / "release_manifest.json"
 CHECKSUMS_PATH = APP_DIR / "SHA256SUMS"
@@ -969,10 +969,10 @@ def installation_health() -> Dict[str, Any]:
     ))
 
     critical_errors = [item for item in components if item.get("critical") and item.get("status") != "ok"]
+    # Obsolete non-runtime repository artifacts do not affect installation health.
+    # The installer removes untracked copies where safe; tracked copies can remain
+    # until the repository commit deletes them without blocking or warning users.
     warnings: List[str] = []
-    for unexpected in ("download",):
-        if (APP_DIR / unexpected).exists():
-            warnings.append(f"Obsolete repository artifact present: {unexpected}")
     healthy = not critical_errors
     return {
         "ok": True,

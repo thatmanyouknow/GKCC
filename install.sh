@@ -29,6 +29,45 @@ if [[ "${SOURCE_DIR}" != "${EXPECTED_REPO}" ]]; then
   echo "The service will use the current path, but move/clone it to ~/GKCC before enabling updates."
 fi
 
+# Refuse to install a mixed or partially uploaded release. This check runs
+# before stopping the working service or changing any local data.
+echo "Validating coordinated GKCC release files..."
+if [[ ! -f "${SOURCE_DIR}/SHA256SUMS" ]]; then
+  echo "ERROR: SHA256SUMS is missing. The release upload is incomplete."
+  exit 1
+fi
+if ! (cd "${SOURCE_DIR}" && sha256sum -c SHA256SUMS); then
+  echo "ERROR: Release checksums failed. Re-upload every file from the same GKCC release."
+  exit 1
+fi
+python3 - "${SOURCE_DIR}" <<'PY_VALIDATE'
+import json
+import pathlib
+import sys
+root = pathlib.Path(sys.argv[1])
+expected = {
+    "config_builder.json": ("groups", 3),
+    "ellis_guide.json": ("steps", 1),
+    "erfc_guide.json": ("steps", 1),
+    "blobifier_guide.json": ("steps", 1),
+    "workflows.json": ("workflows", 4),
+    "config.default.json": (None, None),
+}
+manifest = json.loads((root / "release_manifest.json").read_text(encoding="utf-8"))
+version = (root / "VERSION").read_text(encoding="utf-8").strip()
+if manifest.get("release") != version:
+    raise SystemExit(f"release_manifest.json says {manifest.get('release')!r}, VERSION says {version!r}")
+for name, (key, schema_version) in expected.items():
+    payload = json.loads((root / name).read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise SystemExit(f"{name}: JSON root is not an object")
+    if key is not None and not isinstance(payload.get(key), list):
+        raise SystemExit(f"{name}: expected a '{key}' array")
+    if schema_version is not None and payload.get("version") != schema_version:
+        raise SystemExit(f"{name}: expected schema version {schema_version}, found {payload.get('version')!r}")
+print(f"Release {version} is internally coordinated.")
+PY_VALIDATE
+
 systemctl stop "${SERVICE_NAME}" 2>/dev/null || true
 systemctl stop "${OLD_SERVICE}" 2>/dev/null || true
 
@@ -38,7 +77,7 @@ mkdir -p "${LOCAL_DIR}/data" "${LOCAL_DIR}/backups" "${LOCAL_DIR}/app-backups"
 # tracked artifact must be deleted in GitHub so the updater can remove it cleanly.
 if [[ -e "${SOURCE_DIR}/download" ]]; then
   if git -C "${SOURCE_DIR}" ls-files --error-unmatch download >/dev/null 2>&1; then
-    echo "NOTICE: tracked obsolete file 'download' remains; delete it from the GitHub repository in the same v0.5.1 commit."
+    echo "NOTICE: tracked obsolete file 'download' remains; delete it from the GitHub repository in the same v0.5.2 commit."
   else
     rm -rf "${SOURCE_DIR}/download"
     echo "Removed obsolete untracked artifact: download"
@@ -139,7 +178,7 @@ if ! systemctl is-active --quiet "${SERVICE_NAME}"; then
 fi
 
 echo
-echo "GKCC Calibration Center v0.5.1 installed."
+echo "GKCC Calibration Center v0.5.2 installed."
 echo "Open: http://mainsailos.local:7128"
 echo "Local data: ${LOCAL_DIR}"
 echo "Service: sudo systemctl status gkcc"

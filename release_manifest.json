@@ -1,8 +1,8 @@
 {
-  "release": "v0.5.1",
+  "release": "v0.5.2",
   "package_format": 1,
-  "frontend_version": "0.5.1",
-  "backend_version": "0.5.1",
+  "frontend_version": "0.5.2",
+  "backend_version": "0.5.2",
   "components": {
     "config_builder.json": {
       "root_key": "groups",
