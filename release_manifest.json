@@ -1,0 +1,44 @@
+{
+  "release": "v0.5.0",
+  "package_format": 1,
+  "frontend_version": "0.5.0",
+  "backend_version": "0.5.0",
+  "components": {
+    "config_builder.json": {
+      "root_key": "groups",
+      "schema_version": 3
+    },
+    "ellis_guide.json": {
+      "root_key": "steps",
+      "schema_version": 1
+    },
+    "erfc_guide.json": {
+      "root_key": "steps",
+      "schema_version": 1
+    },
+    "blobifier_guide.json": {
+      "root_key": "steps",
+      "schema_version": 1
+    },
+    "workflows.json": {
+      "root_key": "workflows",
+      "schema_version": 4
+    },
+    "config.default.json": {
+      "root_key": null,
+      "schema_version": null
+    }
+  },
+  "critical_files": [
+    "VERSION",
+    "release_manifest.json",
+    "calibration_center.py",
+    "index.html",
+    "config.default.json",
+    "config_builder.json",
+    "ellis_guide.json",
+    "erfc_guide.json",
+    "blobifier_guide.json",
+    "workflows.json"
+  ]
+}

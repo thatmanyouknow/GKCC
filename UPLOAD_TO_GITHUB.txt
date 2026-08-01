@@ -1,48 +1,37 @@
-GKCC v0.4.6 GITHUB UPDATE STEPS
-================================
+GKCC v0.5.0 CLEAN CONSOLIDATION UPDATE
+======================================
 
-IMPORTANT: Do not upload this ZIP as one file and stop there. GitHub will store
-it as a ZIP; it will not unpack it into the repository, and Moonraker cannot
-update the application that way.
+This release repairs the mixed filenames that caused the browser flatMap error.
+Upload ALL CONTENTS from inside GKCC-upload directly into the repository root.
+Do not upload the ZIP as a single repository file.
 
-1. Extract GKCC_GitHub_Upload_v0.4.6.zip on your Windows PC.
-2. Open the extracted "GKCC-upload" folder.
-3. Open https://github.com/thatmanyouknow/GKCC in your browser.
+1. Extract GKCC_GitHub_Upload_v0.5.0.zip on Windows.
+2. Open the extracted GKCC-upload folder.
+3. Open https://github.com/thatmanyouknow/GKCC and select the main branch.
 4. Click Add file -> Upload files.
-5. Drag ALL CONTENTS from inside GKCC-upload into the upload page.
-   README.md, install.sh, calibration_center.py, index.html, and the JSON guide
-   files must appear at the root of the repository. Do not leave them inside
-   another folder.
-6. Use this commit message:
-       Add live I/O and motion test bench v0.4.6
-7. Commit directly to the main branch.
-8. On the Releases or Tags page, create tag:
-       v0.4.6
+5. Press Ctrl+A inside GKCC-upload and drag every selected item to GitHub.
+6. Confirm these files appear at the repository root before committing:
+     VERSION
+     release_manifest.json
+     calibration_center.py
+     index.html
+     config_builder.json
+     ellis_guide.json
+     erfc_guide.json
+     blobifier_guide.json
+     workflows.json
+     config.default.json
+     install.sh
+     SHA256SUMS
+7. Commit directly to main with:
+     Consolidate and repair GKCC v0.5.0
+8. On the repository Code page, delete the obsolete tracked item named "download"
+   if it is still present. Also delete a tracked __pycache__ folder if GitHub shows it.
+9. In Mainsail Update Manager, update gkcc.
+10. Restart the gkcc service if Update Manager does not do it automatically.
+11. Refresh the browser with Ctrl+F5.
+12. Open Installation health. Every critical component should show OK before
+    using Live apply or restoring a configuration backup.
 
-UPDATE THE PRINTER
-==================
-
-In Mainsail, open Update Manager and press Update beside gkcc. Then refresh the
-GKCC page with Ctrl+F5.
-
-FIRST TEST
-==========
-
-1. Unlock GKCC.
-2. Open ERCF / Happy Hare.
-3. Find Live I/O and motion test bench.
-4. Press and release each switch while watching its state and Changes count.
-5. Confirm the movement checklist before operating a servo or stepper.
-6. Start with Buzz gear / Buzz selector or servo UP/DOWN while standing beside
-   the printer.
-7. Use the red EMERGENCY STOP button for unexpected motion.
-
-WHAT v0.4.6 ADDS
-================
-
-- Live configured input indicators and pin names.
-- Switch transition counts.
-- Happy Hare servo and motor test controls.
-- Selector home and gate-selection tests with typed confirmation.
-- Klipper STEPPER_BUZZ for runtime-reported steppers.
-- Immediate Moonraker emergency stop.
+If Installation health reports a mismatch, do not use Live apply. The page will
+identify the exact missing, corrupt, or wrong-version file.

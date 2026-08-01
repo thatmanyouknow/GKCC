@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""GKCC Calibration Center v0.4.6.
+"""GKCC Calibration Center v0.5.0.
 
 A small local web service for guided Klipper and Happy Hare calibration.
 The first release is intentionally conservative: it reads status, sends a
 small allow-listed set of calibration actions, records operator results, and
-produces a printable as-built HTML report. Version 0.4.6 adds a live I/O and motion test bench with switch indicators, guarded servo controls, stepper buzz tests, selector tests, and immediate emergency stop.
+produces a printable as-built HTML report. Version 0.5.0 consolidates the application, schemas, guides, and live-write safeguards into one version-checked release.
 """
 from __future__ import annotations
 
@@ -30,6 +30,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 APP_DIR = Path(__file__).resolve().parent
+APP_VERSION = "0.5.0"
+VERSION_PATH = APP_DIR / "VERSION"
+RELEASE_MANIFEST_PATH = APP_DIR / "release_manifest.json"
+CHECKSUMS_PATH = APP_DIR / "SHA256SUMS"
 # Keep machine-specific configuration and calibration records outside the Git
 # checkout. This lets Moonraker update the repository without reporting it as
 # modified or replacing the operator's saved data.
@@ -729,6 +733,153 @@ def valid_token(token: Optional[str], client_ip: str) -> bool:
         return True
 
 
+def _health_component(name: str, status: str, message: str, critical: bool = False) -> Dict[str, Any]:
+    return {"name": name, "status": status, "message": message, "critical": bool(critical)}
+
+
+def _json_shape_check(filename: str, root_key: Optional[str], expected_version: Optional[int]) -> Tuple[bool, str]:
+    path = APP_DIR / filename
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return False, "file is missing"
+    except (OSError, json.JSONDecodeError) as exc:
+        return False, f"invalid JSON: {exc}"
+    if not isinstance(payload, dict):
+        return False, "JSON root must be an object"
+    if root_key:
+        value = payload.get(root_key)
+        if not isinstance(value, list):
+            return False, f"expected a '{root_key}' array"
+    if expected_version is not None and payload.get("version") != expected_version:
+        return False, f"schema version is {payload.get('version')!r}; expected {expected_version}"
+    return True, "loaded and structurally valid"
+
+
+def _checksum_map() -> Dict[str, str]:
+    result: Dict[str, str] = {}
+    try:
+        lines = CHECKSUMS_PATH.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return result
+    for line in lines:
+        match = re.match(r"^([0-9a-fA-F]{64})\s+\*?(.+)$", line.strip())
+        if match:
+            result[match.group(2).strip()] = match.group(1).lower()
+    return result
+
+
+def installation_health() -> Dict[str, Any]:
+    """Validate that all runtime pieces belong to the same coordinated release."""
+    components: List[Dict[str, Any]] = []
+    manifest = read_json(RELEASE_MANIFEST_PATH, {})
+    manifest_ok = isinstance(manifest, dict) and manifest.get("release") == f"v{APP_VERSION}"
+    components.append(_health_component(
+        "release_manifest.json",
+        "ok" if manifest_ok else "error",
+        f"release {manifest.get('release', 'missing')}" if manifest_ok else f"expected release v{APP_VERSION}",
+        critical=not manifest_ok,
+    ))
+
+    try:
+        version_file = VERSION_PATH.read_text(encoding="utf-8").strip().lstrip("v")
+    except OSError:
+        version_file = "missing"
+    version_ok = version_file == APP_VERSION
+    components.append(_health_component(
+        "VERSION",
+        "ok" if version_ok else "error",
+        f"v{version_file}" if version_ok else f"found {version_file}; expected v{APP_VERSION}",
+        critical=not version_ok,
+    ))
+
+    expected = manifest.get("components", {}) if isinstance(manifest, dict) else {}
+    default_expected = {
+        "config_builder.json": {"root_key": "groups", "schema_version": 3},
+        "ellis_guide.json": {"root_key": "steps", "schema_version": 1},
+        "erfc_guide.json": {"root_key": "steps", "schema_version": 1},
+        "blobifier_guide.json": {"root_key": "steps", "schema_version": 1},
+        "workflows.json": {"root_key": "workflows", "schema_version": 4},
+        "config.default.json": {"root_key": None, "schema_version": None},
+    }
+    for filename, fallback in default_expected.items():
+        spec = expected.get(filename, fallback) if isinstance(expected, dict) else fallback
+        ok, message = _json_shape_check(filename, spec.get("root_key"), spec.get("schema_version"))
+        components.append(_health_component(filename, "ok" if ok else "error", message, critical=not ok))
+
+    try:
+        index_text = INDEX_PATH.read_text(encoding="utf-8")
+    except OSError as exc:
+        index_text = ""
+        components.append(_health_component("index.html", "error", str(exc), critical=True))
+    else:
+        marker = re.search(r'<meta\s+name="gkcc-version"\s+content="([^"]+)"', index_text)
+        frontend_version = marker.group(1).lstrip("v") if marker else "missing"
+        ok = frontend_version == APP_VERSION
+        components.append(_health_component(
+            "frontend version",
+            "ok" if ok else "error",
+            f"v{frontend_version}" if ok else f"found {frontend_version}; expected v{APP_VERSION}",
+            critical=not ok,
+        ))
+
+    checksums = _checksum_map()
+    critical_files = manifest.get("critical_files", []) if isinstance(manifest, dict) else []
+    if not isinstance(critical_files, list) or not critical_files:
+        critical_files = [
+            "VERSION", "release_manifest.json", "calibration_center.py", "index.html",
+            "config.default.json", "config_builder.json", "ellis_guide.json",
+            "erfc_guide.json", "blobifier_guide.json", "workflows.json",
+        ]
+    checksum_errors = []
+    for filename in critical_files:
+        expected_hash = checksums.get(str(filename))
+        path = APP_DIR / str(filename)
+        if not expected_hash:
+            checksum_errors.append(f"{filename}: no checksum")
+            continue
+        try:
+            actual = hashlib.sha256(path.read_bytes()).hexdigest()
+        except OSError:
+            checksum_errors.append(f"{filename}: missing")
+            continue
+        if actual != expected_hash:
+            checksum_errors.append(f"{filename}: changed or mismatched")
+    checksum_ok = not checksum_errors
+    components.append(_health_component(
+        "release checksums",
+        "ok" if checksum_ok else "error",
+        "all critical files match" if checksum_ok else "; ".join(checksum_errors[:8]),
+        critical=not checksum_ok,
+    ))
+
+    critical_errors = [item for item in components if item.get("critical") and item.get("status") != "ok"]
+    warnings: List[str] = []
+    for unexpected in ("download",):
+        if (APP_DIR / unexpected).exists():
+            warnings.append(f"Obsolete repository artifact present: {unexpected}")
+    healthy = not critical_errors
+    return {
+        "ok": True,
+        "healthy": healthy,
+        "writes_allowed": healthy and bool(config().get("allow_live_config_writes", True)),
+        "release": f"v{APP_VERSION}",
+        "backend_version": APP_VERSION,
+        "version_file": version_file,
+        "components": components,
+        "warnings": warnings,
+        "summary": "Installation is coordinated and live writes are available." if healthy else "Installation mismatch detected. Live configuration writes are blocked.",
+    }
+
+
+def require_healthy_installation_for_write() -> None:
+    health = installation_health()
+    if not health.get("writes_allowed"):
+        details = [item.get("name") for item in health.get("components", []) if item.get("status") != "ok"]
+        suffix = f" ({', '.join(details)})" if details else ""
+        raise RuntimeError("GKCC installation health check failed; live file writes are blocked" + suffix)
+
+
 def public_config() -> Dict[str, Any]:
     cfg = config()
     return {
@@ -737,7 +888,8 @@ def public_config() -> Dict[str, Any]:
         "printer_name": cfg.get("printer_name", "Voron"),
         "allow_machine_actions": bool(cfg.get("allow_machine_actions", True)),
         "allow_live_config_writes": bool(cfg.get("allow_live_config_writes", True)),
-        "version": "0.4.6",
+        "version": APP_VERSION,
+        "installation_healthy": installation_health().get("healthy", False),
     }
 
 
@@ -1807,6 +1959,7 @@ def apply_live_plan(
     allow_incomplete: bool,
     allow_full_replace: bool = False,
 ) -> Dict[str, Any]:
+    require_healthy_installation_for_write()
     if not config().get("allow_live_config_writes", True):
         raise RuntimeError("Live configuration writes are disabled in config.json")
     ok, reason = live_write_is_safe(require_ready=True)
@@ -2009,7 +2162,7 @@ h1{{font-size:34px;margin-bottom:4px}}h2{{border-bottom:2px solid #222;padding-b
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "GKCC/0.4.6"
+    server_version = f"GKCC/{APP_VERSION}"
 
     @property
     def client_ip(self) -> str:
@@ -2065,6 +2218,9 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/api/config":
             self.send_json(public_config())
+            return
+        if path == "/api/install/health":
+            self.send_json(installation_health())
             return
         if path == "/api/profile":
             self.send_json(read_json(PROFILE_PATH, DEFAULT_PROFILE))
@@ -2277,6 +2433,7 @@ class Handler(BaseHTTPRequestHandler):
             if path == "/api/live/restore":
                 if not self.require_token():
                     return
+                require_healthy_installation_for_write()
                 data = self.read_json()
                 if str(data.get("confirmation", "")) != "RESTORE":
                     raise ValueError("Type RESTORE to confirm backup restoration")
@@ -2427,7 +2584,7 @@ def main() -> None:
     threading.Thread(target=status_worker, name="moonraker-status", daemon=True).start()
     port = int(config()["port"])
     server = ThreadingHTTPServer(("0.0.0.0", port), Handler)
-    print(f"GKCC Calibration Center v0.4.6: http://0.0.0.0:{port}")
+    print(f"GKCC Calibration Center v{APP_VERSION}: http://0.0.0.0:{port}")
     print("Live configuration writes use backup, diff review, restart validation, and rollback.")
     try:
         server.serve_forever()

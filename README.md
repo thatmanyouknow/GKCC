@@ -2,7 +2,7 @@
 
 GKCC is a lightweight browser-based configuration, calibration, and as-built documentation application for Klipper / Moonraker printers and ERCF / Happy Hare installations.
 
-## Live I/O diagnostics, Happy Hare setup, position teaching, configuration context, and Blobifier commissioning (v0.4.6)
+## Live I/O diagnostics, Happy Hare setup, position teaching, configuration context, and Blobifier commissioning (v0.5.0)
 
 GKCC now includes a full first-run workflow for an installed Blobifier:
 
@@ -16,7 +16,7 @@ Blobifier actions are supervised and PIN locked. The first heated test requires 
 
 ## Current release
 
-Version: **v0.4.6**
+Version: **v0.5.0**
 
 ### Live I/O and motion test bench
 
