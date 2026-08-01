@@ -1,11 +1,11 @@
-GKCC v0.4.2 GITHUB UPDATE STEPS
+GKCC v0.4.3 GITHUB UPDATE STEPS
 ================================
 
 IMPORTANT: Do not upload this ZIP as one file and stop there. GitHub will store
 it as a ZIP; it will not unpack it into the repository, and Moonraker cannot
 update the application that way.
 
-1. Extract GKCC_GitHub_Upload_v0.4.2.zip on your Windows PC.
+1. Extract GKCC_GitHub_Upload_v0.4.3.zip on your Windows PC.
 2. Open the extracted "GKCC-upload" folder.
 3. Open https://github.com/thatmanyouknow/GKCC in your browser.
 4. Click Add file -> Upload files.
@@ -14,10 +14,10 @@ update the application that way.
    files must appear at the root of the repository. Do not leave them inside
    another folder.
 6. Use this commit message:
-       Add highlighted cfg editing window v0.4.2
+       Add machine position teaching v0.4.3
 7. Commit directly to the main branch.
 8. On the Releases or Tags page, create tag:
-       v0.4.2
+       v0.4.3
 
 UPDATE THE PRINTER
 ==================
@@ -34,16 +34,16 @@ sudo bash install.sh
 Open:
 http://mainsailos.local:7128
 
-WHAT v0.4.2 ADDS
+WHAT v0.4.3 ADDS
 ================
 
-- Keep the relevant live/imported .cfg file open beside the guided form.
-- Highlight the exact section and option being edited with line numbers.
-- Show current loaded value versus the draft value while typing.
-- Mark newly inserted settings and automatically scroll them into view.
-- Open a larger configuration-file window from any guided field.
-- Open Blobifier servo and bucket pins directly in blobifier_hw.cfg.
-- Preserve the v0.4.1 Blobifier commissioning workflow and v0.3 transactional backup/apply/rollback protections.
+- Jog X, Y, and Z from GKCC with 10, 1, 0.1, or 0.01 mm steps.
+- Require XYZ homed, idle printer state, operator acknowledgement, and valid Klipper travel limits.
+- Capture the exact G-code position used by direct G1 moves.
+- Write Blobifier brush, purge, tray, Klicky dock, or custom XYZ coordinates into the cfg draft.
+- Convert Blobifier Y coordinates into the official Y-max offset values.
+- Save notebook-only hardware locations and notes.
+- Open and highlight every affected cfg line before the existing backed-up live-apply transaction.
 
 LIVE-APPLY FIRST USE
 ====================

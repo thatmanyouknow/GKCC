@@ -2,7 +2,7 @@
 
 GKCC is a lightweight browser-based configuration, calibration, and as-built documentation application for Klipper / Moonraker printers and ERCF / Happy Hare installations.
 
-## Configuration context window and Blobifier commissioning (v0.4.2)
+## Position teaching, configuration context, and Blobifier commissioning (v0.4.3)
 
 GKCC now includes a full first-run workflow for an installed Blobifier:
 
@@ -16,7 +16,20 @@ Blobifier actions are supervised and PIN locked. The first heated test requires 
 
 ## Current release
 
-Version: **v0.4.2**
+Version: **v0.4.3**
+
+### Teach machine positions
+
+The **Teach machine positions** entry opens a supervised coordinate-teaching panel. Home XYZ, jog the toolhead with 10, 1, 0.1, or 0.01 mm steps, and capture the live G-code position used by direct `G1` moves. GKCC also displays the machine coordinate and G-code origin so offsets are visible.
+
+Built-in mappings cover:
+
+- Blobifier brush contact, brush far edge/width, purge point, and tray top.
+- Klicky `docklocation_x`, `docklocation_y`, and `docklocation_z` variables.
+- Custom XYZ variables in any imported/live configuration section.
+- Notebook-only locations that do not change configuration.
+
+Blobifier Y positions are converted to the offsets used by the official macro (`axis_maximum.y - skew_correction - captured_y`). Captured values update the draft only; the affected `.cfg` line opens highlighted, and live writing still requires diff review, backup, typed approval, restart validation, and rollback protection.
 
 ### Configuration file window
 
@@ -86,6 +99,7 @@ The operator must unlock machine controls with the GKCC PIN and type `APPLY` bef
 - Optional restart validation automatically restores the backup if Klipper returns `error`, `shutdown`, or does not return ready before the timeout.
 - An automatic backup cannot prove that pins, thermistors, currents, heaters, travel limits, or imported values are safe for the connected hardware.
 - Each individual manual filament move remains limited by the backend to 100 mm and 100 mm/s.
+- Each XYZ teaching jog is limited to 25 mm, requires XYZ homed, is blocked during printing or pause, and is checked against Klipper axis limits. XY jog speed is capped at 50 mm/s and Z at 10 mm/s.
 - Hotend targets remain limited to 290 °C.
 
 ## First installation

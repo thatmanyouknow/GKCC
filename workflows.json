@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "workflows": [
     {
       "id": "config_builder",
@@ -31,6 +31,46 @@
           "title": "Preview, back up, and apply or export",
           "kind": "export",
           "instructions": "Inspect every changed file. GKCC creates a backup before live updates and can export a review ZIP."
+        }
+      ]
+    },
+    {
+      "id": "machine_position_teaching",
+      "section": "Teach machine positions",
+      "title": "Jog, capture, and map a hardware location",
+      "summary": "Home XYZ, move the toolhead with supervised small jogs, capture the live G-code position, and map it to Blobifier, Klicky, custom cfg variables, or a notebook-only record.",
+      "status": "ready",
+      "safety": "Idle only. XYZ must be homed. Start above hardware, reduce step size near contact, and remain at the printer.",
+      "steps": [
+        {
+          "id": "home",
+          "title": "Home and clear the path",
+          "kind": "checklist",
+          "instructions": "Home XYZ, verify the intended hardware state, and approach from a safe Z height."
+        },
+        {
+          "id": "jog",
+          "title": "Jog to the physical reference",
+          "kind": "motion",
+          "instructions": "Use 10 or 1 mm only in open space, then 0.1 or 0.01 mm near the reference point."
+        },
+        {
+          "id": "capture",
+          "title": "Capture G-code coordinates",
+          "kind": "measurement",
+          "instructions": "Capture the coordinate that a direct G1 move would use and review any G-code origin offset."
+        },
+        {
+          "id": "map",
+          "title": "Map to cfg variables",
+          "kind": "config",
+          "instructions": "Choose the Blobifier, Klicky, or custom destination and review the transformed values."
+        },
+        {
+          "id": "review",
+          "title": "Review highlighted cfg lines",
+          "kind": "review",
+          "instructions": "Inspect the affected source lines and use the normal backup, diff, apply, and rollback workflow."
         }
       ]
     },

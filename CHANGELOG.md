@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.4.3
+
+- Added a reusable **Teach machine positions** workflow for Blobifier, Klicky, and custom hardware locations.
+- Added live G-code and machine-coordinate display, supervised X/Y/Z jogging, selectable 10/1/0.1/0.01 mm steps, independent XY and Z speeds, homing checks, print-state blocking, and Klipper travel-limit checks.
+- Added one-click capture of the current G-code position and a location notebook stored with the GKCC project.
+- Added Blobifier presets that convert captured coordinates into `brush_start`, `brush_width`, `brush_y_offset`, `purge_x`, `y_offset`, `brush_top`, and `tray_top` draft values.
+- Added Klicky and custom XYZ targets with exact section and option names.
+- Writing a captured location updates only the draft, opens the configuration viewer, and highlights the affected line before the normal backup/diff/live-apply workflow.
+
 ## v0.4.2
 
 - Added an always-visible configuration file window beside the guided variable forms.

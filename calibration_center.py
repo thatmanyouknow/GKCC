@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""GKCC Calibration Center v0.4.2.
+"""GKCC Calibration Center v0.4.3.
 
 A small local web service for guided Klipper and Happy Hare calibration.
 The first release is intentionally conservative: it reads status, sends a
 small allow-listed set of calibration actions, records operator results, and
-produces a printable as-built HTML report. Version 0.4 adds guided Blobifier commissioning while retaining transactional live configuration updates, exact diffs, backups, restart validation, and automatic rollback.
+produces a printable as-built HTML report. Version 0.4.3 adds safe XYZ jogging and coordinate teaching so physical locations such as a Blobifier brush or Klicky dock can be captured directly into the configuration draft.
 """
 from __future__ import annotations
 
@@ -69,6 +69,10 @@ _state: Dict[str, Any] = {
     "filename": "",
     "homed_axes": "",
     "position": [0.0, 0.0, 0.0, 0.0],
+    "gcode_position": [0.0, 0.0, 0.0, 0.0],
+    "homing_origin": [0.0, 0.0, 0.0, 0.0],
+    "axis_minimum": [0.0, 0.0, 0.0],
+    "axis_maximum": [0.0, 0.0, 0.0],
     "extruder": {},
     "heater_bed": {},
     "sensors": {},
@@ -101,7 +105,7 @@ DEFAULT_PROFILE: Dict[str, Any] = {
 
 
 DEFAULT_BUILDER_PROJECT: Dict[str, Any] = {
-    "version": 2,
+    "version": 3,
     "updated_at": None,
     "meta": {
         "printer_name": "",
@@ -116,6 +120,7 @@ DEFAULT_BUILDER_PROJECT: Dict[str, Any] = {
     "section_order": [],
     "wizard": {"ellis": {}, "erfc": {}, "blobifier": {}},
     "import_warnings": [],
+    "taught_locations": [],
     "live": {
         "baseline_at": None,
         "source_files": {},
@@ -401,7 +406,7 @@ def object_list() -> List[str]:
 
 def build_query(objects: List[str], include_config: bool = False) -> Dict[str, Any]:
     requested: Dict[str, Any] = {}
-    for name in ("webhooks", "print_stats", "toolhead", "extruder", "heater_bed"):
+    for name in ("webhooks", "print_stats", "toolhead", "gcode_move", "extruder", "heater_bed"):
         if name in objects:
             requested[name] = None
     for name in objects:
@@ -439,6 +444,9 @@ def refresh_status() -> None:
         webhooks = status.get("webhooks", {})
         print_stats = status.get("print_stats", {})
         toolhead = status.get("toolhead", {})
+        gcode_move = status.get("gcode_move", {})
+        machine_position = toolhead.get("position", gcode_move.get("position", [0.0, 0.0, 0.0, 0.0]))
+        gcode_position = gcode_move.get("gcode_position", machine_position)
         with _state_lock:
             _state.update({
                 "connected": True,
@@ -447,7 +455,11 @@ def refresh_status() -> None:
                 "print_state": print_stats.get("state", "unknown"),
                 "filename": print_stats.get("filename", ""),
                 "homed_axes": toolhead.get("homed_axes", ""),
-                "position": toolhead.get("position", [0.0, 0.0, 0.0, 0.0]),
+                "position": machine_position,
+                "gcode_position": gcode_position,
+                "homing_origin": gcode_move.get("homing_origin", [0.0, 0.0, 0.0, 0.0]),
+                "axis_minimum": toolhead.get("axis_minimum", [0.0, 0.0, 0.0]),
+                "axis_maximum": toolhead.get("axis_maximum", [0.0, 0.0, 0.0]),
                 "extruder": status.get("extruder", {}),
                 "heater_bed": status.get("heater_bed", {}),
                 "sensors": sensors,
@@ -479,6 +491,85 @@ def printer_is_idle() -> Tuple[bool, str]:
     if print_state in {"printing", "paused"}:
         return False, "A print is active"
     return True, "ready"
+
+
+def position_snapshot() -> Dict[str, Any]:
+    """Return coordinates used by G1 plus the machine coordinate and travel limits."""
+    objects = object_list()
+    requested: Dict[str, Any] = {}
+    if "gcode_move" in objects:
+        requested["gcode_move"] = ["gcode_position", "position", "homing_origin"]
+    if "toolhead" in objects:
+        requested["toolhead"] = ["position", "homed_axes", "axis_minimum", "axis_maximum"]
+    reply = moonraker_request(
+        "/printer/objects/query",
+        method="POST",
+        payload={"objects": requested},
+        timeout=15.0,
+    )
+    result = reply.get("result", reply) if isinstance(reply, dict) else {}
+    status = result.get("status", {}) if isinstance(result, dict) else {}
+    toolhead = status.get("toolhead", {}) if isinstance(status, dict) else {}
+    gcode_move = status.get("gcode_move", {}) if isinstance(status, dict) else {}
+    machine = toolhead.get("position", gcode_move.get("position", [0.0, 0.0, 0.0, 0.0]))
+    gcode = gcode_move.get("gcode_position", machine)
+    return {
+        "captured_at": now_iso(),
+        "gcode_position": list(gcode) if isinstance(gcode, (list, tuple)) else [0.0, 0.0, 0.0, 0.0],
+        "machine_position": list(machine) if isinstance(machine, (list, tuple)) else [0.0, 0.0, 0.0, 0.0],
+        "homing_origin": list(gcode_move.get("homing_origin", [0.0, 0.0, 0.0, 0.0])),
+        "homed_axes": str(toolhead.get("homed_axes", "")),
+        "axis_minimum": list(toolhead.get("axis_minimum", [0.0, 0.0, 0.0])),
+        "axis_maximum": list(toolhead.get("axis_maximum", [0.0, 0.0, 0.0])),
+    }
+
+
+def require_homed_axes(required: str = "xyz") -> None:
+    with _state_lock:
+        homed = str(_state.get("homed_axes", "")).lower()
+    missing = [axis.upper() for axis in required.lower() if axis not in homed]
+    if missing:
+        raise RuntimeError("Home " + ", ".join(missing) + " before moving or teaching a location")
+
+
+def jog_axis(axis: str, distance: float, speed: float) -> Dict[str, Any]:
+    axis = axis.lower().strip()
+    if axis not in {"x", "y", "z"}:
+        raise ValueError("Axis must be X, Y, or Z")
+    if not (-25.0 <= distance <= 25.0) or abs(distance) < 0.0005:
+        raise ValueError("Jog distance must be between -25 and 25 mm")
+    max_speed = 50.0 if axis in {"x", "y"} else 10.0
+    if not (0.1 <= speed <= max_speed):
+        raise ValueError(f"{axis.upper()} jog speed must be between 0.1 and {max_speed:g} mm/s")
+    ok, reason = printer_is_idle()
+    if not ok:
+        raise RuntimeError(reason)
+    require_homed_axes("xyz")
+    current = position_snapshot()
+    machine = current.get("machine_position", [0.0, 0.0, 0.0])
+    minimum = current.get("axis_minimum", [0.0, 0.0, 0.0])
+    maximum = current.get("axis_maximum", [0.0, 0.0, 0.0])
+    index = {"x": 0, "y": 1, "z": 2}[axis]
+    try:
+        target = float(machine[index]) + distance
+        low = float(minimum[index])
+        high = float(maximum[index])
+    except (IndexError, TypeError, ValueError):
+        raise RuntimeError("Klipper did not provide usable axis limits")
+    if target < low - 0.001 or target > high + 0.001:
+        raise ValueError(
+            f"Jog would move {axis.upper()} to {target:.3f} mm, outside {low:.3f}–{high:.3f} mm"
+        )
+    feed = speed * 60.0
+    script = "\n".join([
+        "SAVE_GCODE_STATE NAME=GKCC_LOCATION_JOG",
+        "G91",
+        f"G1 {axis.upper()}{distance:.4f} F{feed:.1f}",
+        "M400",
+        "RESTORE_GCODE_STATE NAME=GKCC_LOCATION_JOG",
+    ])
+    run_gcode(script, f"Teach-location jog {axis.upper()} {distance:+.3f} mm")
+    return {"ok": True, "script": script, "position": position_snapshot()}
 
 
 def run_gcode(script: str, action_name: str) -> Any:
@@ -538,7 +629,7 @@ def public_config() -> Dict[str, Any]:
         "printer_name": cfg.get("printer_name", "Voron"),
         "allow_machine_actions": bool(cfg.get("allow_machine_actions", True)),
         "allow_live_config_writes": bool(cfg.get("allow_live_config_writes", True)),
-        "version": "0.4.2",
+        "version": "0.4.3",
     }
 
 
@@ -727,6 +818,28 @@ def normalize_builder_project(payload: Dict[str, Any]) -> Dict[str, Any]:
     warnings = incoming.get("import_warnings", [])
     if isinstance(warnings, list):
         project["import_warnings"] = [str(x)[:1000] for x in warnings[:200]]
+    taught_locations = incoming.get("taught_locations", [])
+    if isinstance(taught_locations, list):
+        normalized_locations: List[Dict[str, Any]] = []
+        for item in taught_locations[-200:]:
+            if not isinstance(item, dict):
+                continue
+            clean: Dict[str, Any] = {
+                "id": str(item.get("id", ""))[:120],
+                "name": str(item.get("name", ""))[:200],
+                "preset": str(item.get("preset", "notebook"))[:80],
+                "captured_at": str(item.get("captured_at", ""))[:100],
+                "notes": str(item.get("notes", ""))[:2000],
+            }
+            for key in ("gcode_position", "machine_position", "axis_minimum", "axis_maximum"):
+                values = item.get(key, [])
+                if isinstance(values, (list, tuple)):
+                    clean[key] = [float(v) for v in list(values)[:6] if isinstance(v, (int, float))]
+            mappings = item.get("mappings", [])
+            if isinstance(mappings, list):
+                clean["mappings"] = [str(v)[:300] for v in mappings[:20]]
+            normalized_locations.append(clean)
+        project["taught_locations"] = normalized_locations
     live_in = incoming.get("live", {}) if isinstance(incoming.get("live", {}), dict) else {}
     live = empty_live_project()
     baseline_at = live_in.get("baseline_at")
@@ -774,7 +887,7 @@ def normalize_builder_project(payload: Dict[str, Any]) -> Dict[str, Any]:
         if cfg_path not in live["file_order"]:
             live["file_order"].append(cfg_path)
     project["live"] = live
-    project["version"] = 2
+    project["version"] = 3
     project["updated_at"] = now_iso()
     return project
 
@@ -1736,7 +1849,7 @@ h1{{font-size:34px;margin-bottom:4px}}h2{{border-bottom:2px solid #222;padding-b
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "GKCC/0.4.2"
+    server_version = "GKCC/0.4.3"
 
     @property
     def client_ip(self) -> str:
@@ -2041,6 +2154,24 @@ class Handler(BaseHTTPRequestHandler):
                     "restart": restart_result,
                 })
                 return
+            if path == "/api/action/capture_position":
+                if not self.require_token():
+                    return
+                ok, reason = printer_is_idle()
+                if not ok:
+                    raise RuntimeError(reason)
+                require_homed_axes("xyz")
+                self.send_json({"ok": True, "position": position_snapshot()})
+                return
+            if path == "/api/action/jog_xyz":
+                if not self.require_token():
+                    return
+                data = self.read_json()
+                axis = str(data.get("axis", ""))
+                distance = float(data.get("distance", 0.0))
+                speed = float(data.get("speed", 5.0))
+                self.send_json(jog_axis(axis, distance, speed))
+                return
             if path == "/api/action/mmu_move":
                 if not self.require_token():
                     return
@@ -2118,7 +2249,7 @@ def main() -> None:
     threading.Thread(target=status_worker, name="moonraker-status", daemon=True).start()
     port = int(config()["port"])
     server = ThreadingHTTPServer(("0.0.0.0", port), Handler)
-    print(f"GKCC Calibration Center v0.4.2: http://0.0.0.0:{port}")
+    print(f"GKCC Calibration Center v0.4.3: http://0.0.0.0:{port}")
     print("Live configuration writes use backup, diff review, restart validation, and rollback.")
     try:
         server.serve_forever()
