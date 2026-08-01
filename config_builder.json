@@ -645,8 +645,8 @@
     },
     {
       "id": "bed_power",
-      "title": "5. Heated bed, fans, and supporting services",
-      "summary": "Bed heater and temperature sensor plus standard Klipper service sections.",
+      "title": "5. Heated bed, electronics cooling, and supporting services",
+      "summary": "Bed heater, temperature sensor, electronics cooling fan, and standard Klipper service sections.",
       "diagram": "printer",
       "fields": [
         {
@@ -677,12 +677,13 @@
           "key": "heater_bed.control",
           "section": "heater_bed",
           "option": "control",
-          "label": "Bed control",
+          "label": "Bed heater control algorithm",
           "type": "select",
           "options": [
             "pid",
             "watermark"
-          ]
+          ],
+          "help": "This is the heater regulation method in [heater_bed], not the electronics fan control."
         },
         {
           "key": "heater_bed.min_temp",
@@ -703,11 +704,62 @@
           "step": 1
         },
         {
-          "key": "controller_fan controller_fan.pin",
-          "section": "controller_fan controller_fan",
+          "key": "electronics_fan.pin",
+          "section": "heater_fan controller_fan",
           "option": "pin",
           "label": "Electronics fan pin",
-          "type": "text"
+          "type": "text",
+          "section_aliases": [
+            "controller_fan controller_fan"
+          ],
+          "help": "Auto-detects either [heater_fan controller_fan] or [controller_fan controller_fan] and writes back to the section found in the loaded file."
+        },
+        {
+          "key": "electronics_fan.kick_start_time",
+          "section": "heater_fan controller_fan",
+          "section_aliases": [
+            "controller_fan controller_fan"
+          ],
+          "option": "kick_start_time",
+          "label": "Electronics fan kick-start time (seconds)",
+          "type": "number",
+          "min": 0,
+          "step": 0.1
+        },
+        {
+          "key": "electronics_fan.heater",
+          "section": "heater_fan controller_fan",
+          "section_aliases": [
+            "controller_fan controller_fan"
+          ],
+          "option": "heater",
+          "label": "Electronics fan trigger heater",
+          "type": "text",
+          "placeholder": "heater_bed"
+        },
+        {
+          "key": "electronics_fan.heater_temp",
+          "section": "heater_fan controller_fan",
+          "section_aliases": [
+            "controller_fan controller_fan"
+          ],
+          "option": "heater_temp",
+          "label": "Electronics fan shutoff temperature (\u00b0C)",
+          "type": "number",
+          "step": 0.1
+        },
+        {
+          "key": "electronics_fan.fan_speed",
+          "section": "heater_fan controller_fan",
+          "section_aliases": [
+            "controller_fan controller_fan"
+          ],
+          "option": "fan_speed",
+          "label": "Electronics fan speed",
+          "type": "number",
+          "min": 0,
+          "max": 1,
+          "step": 0.01
         },
         {
           "key": "virtual_sdcard.path",
@@ -897,54 +949,67 @@
     {
       "id": "erfc_parameters",
       "title": "8. Happy Hare geometry and operating parameters",
-      "summary": "Calibration results and operating limits normally placed in mmu_parameters.cfg.",
+      "summary": "Happy Hare operating parameters from the real [mmu] section in mmu_parameters.cfg. Commented defaults and values stored only in mmu_vars.cfg are not treated as active cfg lines.",
       "diagram": "erfc",
       "fields": [
         {
           "key": "mmu_parameters.servo_up_angle",
-          "section": "mmu_parameters",
+          "section": "mmu",
           "option": "servo_up_angle",
           "label": "Servo up angle",
           "type": "number",
-          "step": 0.1
+          "step": 0.1,
+          "section_aliases": [
+            "mmu_parameters"
+          ],
+          "help": "Configured default angle. A servo position saved with MMU_SERVO SAVE=1 in mmu_vars.cfg can override this value."
         },
         {
           "key": "mmu_parameters.servo_down_angle",
-          "section": "mmu_parameters",
+          "section": "mmu",
           "option": "servo_down_angle",
           "label": "Servo down angle",
           "type": "number",
-          "step": 0.1
+          "step": 0.1,
+          "section_aliases": [
+            "mmu_parameters"
+          ],
+          "help": "Configured default angle. A servo position saved with MMU_SERVO SAVE=1 in mmu_vars.cfg can override this value."
         },
         {
           "key": "mmu_parameters.gate_homing_max",
-          "section": "mmu_parameters",
+          "section": "mmu",
           "option": "gate_homing_max",
           "label": "Gate homing maximum (mm)",
           "type": "number",
           "min": 1,
-          "step": 0.1
+          "step": 0.1,
+          "section_aliases": [
+            "mmu_parameters"
+          ]
         },
         {
           "key": "mmu_parameters.gate_parking_distance",
-          "section": "mmu_parameters",
+          "section": "mmu",
           "option": "gate_parking_distance",
           "label": "Gate parking distance (mm)",
           "type": "number",
-          "step": 0.1
+          "step": 0.1,
+          "section_aliases": [
+            "mmu_parameters"
+          ]
         },
         {
-          "key": "mmu_parameters.calibrated_bowden_length",
-          "section": "mmu_parameters",
-          "option": "calibrated_bowden_length",
-          "label": "Calibrated Bowden length (mm)",
+          "key": "meta.calibrated_bowden_length",
+          "label": "Saved calibrated Bowden length (mm; reference only)",
           "type": "number",
           "min": 0,
-          "step": 0.1
+          "step": 0.1,
+          "help": "Happy Hare stores the saved Bowden calibration in mmu_vars.cfg. Change it with MMU_CALIBRATE_BOWDEN SAVE=1; GKCC will not add an invalid calibrated_bowden_length line to [mmu]."
         },
         {
           "key": "mmu_parameters.extruder_homing_endstop",
-          "section": "mmu_parameters",
+          "section": "mmu",
           "option": "extruder_homing_endstop",
           "label": "Extruder homing endstop",
           "type": "select",
@@ -953,90 +1018,120 @@
             "extruder",
             "toolhead",
             "none"
+          ],
+          "section_aliases": [
+            "mmu_parameters"
           ]
         },
         {
           "key": "mmu_parameters.toolhead_entry_to_extruder",
-          "section": "mmu_parameters",
+          "section": "mmu",
           "option": "toolhead_entry_to_extruder",
           "label": "Entry sensor to extruder gears (mm)",
           "type": "number",
           "min": 0,
-          "step": 0.1
+          "step": 0.1,
+          "section_aliases": [
+            "mmu_parameters"
+          ]
         },
         {
           "key": "mmu_parameters.toolhead_extruder_to_nozzle",
-          "section": "mmu_parameters",
+          "section": "mmu",
           "option": "toolhead_extruder_to_nozzle",
           "label": "Extruder gears to internal nozzle shoulder (mm)",
           "type": "number",
           "min": 0,
-          "step": 0.1
+          "step": 0.1,
+          "section_aliases": [
+            "mmu_parameters"
+          ]
         },
         {
           "key": "mmu_parameters.toolhead_sensor_to_nozzle",
-          "section": "mmu_parameters",
+          "section": "mmu",
           "option": "toolhead_sensor_to_nozzle",
           "label": "Toolhead sensor to internal nozzle shoulder (mm)",
           "type": "number",
           "min": 0,
-          "step": 0.1
+          "step": 0.1,
+          "section_aliases": [
+            "mmu_parameters"
+          ]
         },
         {
           "key": "mmu_parameters.flowguard_encoder_max_motion",
-          "section": "mmu_parameters",
+          "section": "mmu",
           "option": "flowguard_encoder_max_motion",
           "label": "FlowGuard encoder maximum motion (mm)",
           "type": "number",
           "min": 0,
-          "step": 0.1
+          "step": 0.1,
+          "section_aliases": [
+            "mmu_parameters"
+          ]
         },
         {
           "key": "mmu_parameters.gear_from_buffer_speed",
-          "section": "mmu_parameters",
+          "section": "mmu",
           "option": "gear_from_buffer_speed",
           "label": "Gear from buffer speed (mm/s)",
           "type": "number",
           "min": 0.1,
-          "step": 0.1
+          "step": 0.1,
+          "section_aliases": [
+            "mmu_parameters"
+          ]
         },
         {
           "key": "mmu_parameters.gear_unload_speed",
-          "section": "mmu_parameters",
+          "section": "mmu",
           "option": "gear_unload_speed",
           "label": "Gear unload speed (mm/s)",
           "type": "number",
           "min": 0.1,
-          "step": 0.1
+          "step": 0.1,
+          "section_aliases": [
+            "mmu_parameters"
+          ]
         },
         {
           "key": "mmu_parameters.endless_spool_enabled",
-          "section": "mmu_parameters",
+          "section": "mmu",
           "option": "endless_spool_enabled",
           "label": "EndlessSpool enabled",
           "type": "select",
           "options": [
             "0",
             "1"
+          ],
+          "section_aliases": [
+            "mmu_parameters"
           ]
         },
         {
           "key": "mmu_parameters.purge_macro",
-          "section": "mmu_parameters",
+          "section": "mmu",
           "option": "purge_macro",
           "label": "Happy Hare purge macro",
           "type": "text",
-          "placeholder": "BLOBIFIER"
+          "placeholder": "BLOBIFIER",
+          "section_aliases": [
+            "mmu_parameters"
+          ]
         },
         {
           "key": "mmu_parameters.force_purge_standalone",
-          "section": "mmu_parameters",
+          "section": "mmu",
           "option": "force_purge_standalone",
           "label": "Force standalone purging",
           "type": "select",
           "options": [
             "0",
             "1"
+          ],
+          "section_aliases": [
+            "mmu_parameters"
           ]
         }
       ]

@@ -787,6 +787,40 @@ def normalize_section_map(value: Any) -> Dict[str, Dict[str, str]]:
     return clean_sections
 
 
+def migrate_legacy_mmu_parameter_section(
+    sections: Dict[str, Dict[str, str]],
+    order: Optional[List[str]] = None,
+    section_files: Optional[Dict[str, str]] = None,
+) -> None:
+    """Move GKCC's old synthetic [mmu_parameters] section into Happy Hare's real [mmu] section."""
+    legacy_name = next((name for name in sections if name.strip().lower() == "mmu_parameters"), None)
+    real_name = next((name for name in sections if name.strip().lower() == "mmu"), None)
+    if not legacy_name:
+        return
+    if not real_name:
+        real_name = "mmu"
+        sections[real_name] = {}
+        if order is not None:
+            try:
+                index = order.index(legacy_name)
+                order[index] = real_name
+            except ValueError:
+                order.append(real_name)
+    for option, value in sections.get(legacy_name, {}).items():
+        # Legacy values are GKCC drafts, so preserve intentional non-empty edits.
+        if str(value).strip() or option not in sections[real_name]:
+            sections[real_name][option] = value
+    sections.pop(legacy_name, None)
+    if order is not None:
+        order[:] = [name for name in order if name != legacy_name]
+        if real_name not in order:
+            order.append(real_name)
+    if section_files is not None:
+        legacy_path = section_files.pop(legacy_name, None)
+        if legacy_path and real_name not in section_files:
+            section_files[real_name] = legacy_path
+
+
 def normalize_builder_project(payload: Dict[str, Any]) -> Dict[str, Any]:
     project = copy.deepcopy(DEFAULT_BUILDER_PROJECT)
     incoming = payload.get("project", payload)
@@ -808,6 +842,7 @@ def normalize_builder_project(payload: Dict[str, Any]) -> Dict[str, Any]:
     for section in project["sections"]:
         if section not in project["section_order"]:
             project["section_order"].append(section)
+    migrate_legacy_mmu_parameter_section(project["sections"], project["section_order"])
     wizard = incoming.get("wizard", {})
     if isinstance(wizard, dict):
         project["wizard"] = {
@@ -865,6 +900,7 @@ def normalize_builder_project(payload: Dict[str, Any]) -> Dict[str, Any]:
                 live["section_files"][section_name] = normalize_config_relpath(str(raw_path))
             except ValueError:
                 continue
+    migrate_legacy_mmu_parameter_section(live["baseline_sections"], None, live["section_files"])
     baseline_includes = live_in.get("baseline_includes", {})
     if isinstance(baseline_includes, dict):
         for raw_path, values in baseline_includes.items():
@@ -896,6 +932,20 @@ def builder_schema() -> Dict[str, Any]:
     return read_json(BUILDER_SCHEMA_PATH, {"groups": []})
 
 
+def field_section_candidates(field: Dict[str, Any]) -> List[str]:
+    return [str(item) for item in [field.get("section"), *field.get("section_aliases", [])] if item]
+
+
+def project_section_for_field(project: Dict[str, Any], field: Dict[str, Any]) -> str:
+    sections = project.get("sections", {})
+    by_lower = {str(name).strip().lower(): str(name) for name in sections}
+    for candidate in field_section_candidates(field):
+        found = by_lower.get(candidate.strip().lower())
+        if found:
+            return found
+    return str(field.get("section", ""))
+
+
 def builder_missing_required(project: Dict[str, Any]) -> List[str]:
     missing: List[str] = []
     for group in builder_schema().get("groups", []):
@@ -903,7 +953,8 @@ def builder_missing_required(project: Dict[str, Any]) -> List[str]:
             if not field.get("required"):
                 continue
             if field.get("section"):
-                value = project.get("sections", {}).get(field["section"], {}).get(field["option"], "")
+                section = project_section_for_field(project, field)
+                value = project.get("sections", {}).get(section, {}).get(field["option"], "")
             else:
                 value = project.get("meta", {}).get(field.get("key", "").split(".", 1)[-1], "")
             if str(value).strip() == "":
@@ -957,13 +1008,14 @@ def generated_files(project: Dict[str, Any]) -> Dict[str, bytes]:
     blobifier_sections = [name for name in all_sections if is_blobifier_section(name)]
     mmu_sections = [
         name for name in all_sections
-        if is_mmu_hardware_section(name) or name in {"mmu_parameters", "mmu_macro_vars"}
+        if is_mmu_hardware_section(name) or name in {"mmu", "mmu_parameters", "mmu_macro_vars"}
     ]
     printer_sections = [name for name in all_sections if name not in set(mmu_sections + blobifier_hw_sections + blobifier_sections)]
     printer_cfg = "\n".join(header + include_lines + ([""] if include_lines else [])) + render_cfg_sections(project, printer_sections)
-    hardware_names = [name for name in mmu_sections if name not in {"mmu_parameters", "mmu_macro_vars"}]
+    hardware_names = [name for name in mmu_sections if name not in {"mmu", "mmu_parameters", "mmu_macro_vars"}]
     mmu_hardware = "\n".join(header) + render_cfg_sections(project, hardware_names)
-    mmu_parameters = "\n".join(header) + render_cfg_sections(project, ["mmu_parameters"])
+    parameter_names = [name for name in ("mmu", "mmu_parameters") if name in project.get("sections", {})]
+    mmu_parameters = "\n".join(header) + render_cfg_sections(project, parameter_names)
     mmu_macro_vars = "\n".join(header) + render_cfg_sections(project, ["mmu_macro_vars"])
     blobifier_cfg = "\n".join(header) + render_cfg_sections(project, blobifier_sections)
     blobifier_hw = "\n".join(header) + render_cfg_sections(project, blobifier_hw_sections)
@@ -1063,8 +1115,8 @@ def is_mmu_hardware_section(section: str) -> bool:
 
 
 def canonical_target_for_section(section: str) -> str:
-    low = section.lower()
-    if low == "mmu_parameters":
+    low = section.lower().strip()
+    if low in {"mmu", "mmu_parameters"}:
         return "mmu/base/mmu_parameters.cfg"
     if low == "mmu_macro_vars":
         return "mmu/base/mmu_macro_vars.cfg"

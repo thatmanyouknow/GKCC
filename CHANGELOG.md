@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.4.5
+
+- Fixed the Happy Hare parameter page to read and edit the real `[mmu]` section used by `mmu/base/mmu_parameters.cfg`.
+- Added automatic migration of draft values created by older GKCC releases under the incorrect synthetic `[mmu_parameters]` section.
+- Corrected configuration-window targeting so existing Happy Hare lines highlight in place instead of proposing a duplicate `[mmu_parameters]` section at the bottom of the file.
+- Corrected review/export routing so the `[mmu]` section remains in `mmu/base/mmu_parameters.cfg` rather than being treated as a printer or MMU-hardware section.
+
+## v0.4.4
+
+- Fixed guided-page population for electronics fans configured as either `[heater_fan controller_fan]` or `[controller_fan controller_fan]`.
+- Added section-alias resolution so imported/live values are edited in the section that actually exists instead of creating a duplicate section.
+- Added guided fields for electronics-fan kick start, trigger heater, shutoff temperature, and fan speed.
+- Renamed `Bed control` to `Bed heater control algorithm` to distinguish it from the bed-triggered electronics fan.
+
 ## v0.4.3
 
 - Added a reusable **Teach machine positions** workflow for Blobifier, Klicky, and custom hardware locations.

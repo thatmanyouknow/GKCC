@@ -1,11 +1,11 @@
-GKCC v0.4.3 GITHUB UPDATE STEPS
+GKCC v0.4.5 GITHUB UPDATE STEPS
 ================================
 
 IMPORTANT: Do not upload this ZIP as one file and stop there. GitHub will store
 it as a ZIP; it will not unpack it into the repository, and Moonraker cannot
 update the application that way.
 
-1. Extract GKCC_GitHub_Upload_v0.4.3.zip on your Windows PC.
+1. Extract GKCC_GitHub_Upload_v0.4.5.zip on your Windows PC.
 2. Open the extracted "GKCC-upload" folder.
 3. Open https://github.com/thatmanyouknow/GKCC in your browser.
 4. Click Add file -> Upload files.
@@ -14,49 +14,31 @@ update the application that way.
    files must appear at the root of the repository. Do not leave them inside
    another folder.
 6. Use this commit message:
-       Add machine position teaching v0.4.3
+       Fix Happy Hare parameter population v0.4.5
 7. Commit directly to the main branch.
 8. On the Releases or Tags page, create tag:
-       v0.4.3
+       v0.4.5
 
 UPDATE THE PRINTER
 ==================
 
-In Mainsail, open Update Manager and press Update beside gkcc.
+In Mainsail, open Update Manager and press Update beside gkcc. Then refresh the
+GKCC page with Ctrl+F5.
 
-If this is the first installation instead:
+After the update:
 
-cd ~
-git clone https://github.com/thatmanyouknow/GKCC.git
-cd GKCC
-sudo bash install.sh
+1. Unlock GKCC.
+2. Open Configuration builder -> Start / import.
+3. Press Load/rebase live files again.
+4. Return to Happy Hare geometry and operating parameters.
+5. Existing values from the [mmu] section should populate and Open in cfg should
+   highlight the existing option instead of adding [mmu_parameters].
 
-Open:
-http://mainsailos.local:7128
+WHAT v0.4.5 FIXES
+=================
 
-WHAT v0.4.3 ADDS
-================
-
-- Jog X, Y, and Z from GKCC with 10, 1, 0.1, or 0.01 mm steps.
-- Require XYZ homed, idle printer state, operator acknowledgement, and valid Klipper travel limits.
-- Capture the exact G-code position used by direct G1 moves.
-- Write Blobifier brush, purge, tray, Klicky dock, or custom XYZ coordinates into the cfg draft.
-- Convert Blobifier Y coordinates into the official Y-max offset values.
-- Save notebook-only hardware locations and notes.
-- Open and highlight every affected cfg line before the existing backed-up live-apply transaction.
-
-LIVE-APPLY FIRST USE
-====================
-
-1. Open Configuration builder -> Start / import.
-2. Unlock controls.
-3. Press Load/rebase live files.
-4. Make or review the guided changes.
-5. Open Review / export, then Live apply.
-6. Press Preview changed files and inspect every diff.
-7. Type APPLY and press Back up and apply live.
-
-The backup protects file recovery. It does not prove that electrical pins,
-thermistors, currents, heater limits, or movement values are safe.
-
-- Dedicated Blobifier setup, geometry, dry-run, test-blob, tuning, backup, and live-apply workflow.
+- Reads Happy Hare parameters from the real [mmu] section.
+- Migrates older GKCC draft values from the incorrect [mmu_parameters] section.
+- Routes [mmu] edits and exports to mmu/base/mmu_parameters.cfg.
+- Prevents calibrated_bowden_length from being added as an invalid [mmu] option.
+- Preserves the backed-up diff/review/live-apply workflow.

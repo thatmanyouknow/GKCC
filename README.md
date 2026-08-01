@@ -2,7 +2,7 @@
 
 GKCC is a lightweight browser-based configuration, calibration, and as-built documentation application for Klipper / Moonraker printers and ERCF / Happy Hare installations.
 
-## Position teaching, configuration context, and Blobifier commissioning (v0.4.3)
+## Happy Hare parameter population, position teaching, configuration context, and Blobifier commissioning (v0.4.5)
 
 GKCC now includes a full first-run workflow for an installed Blobifier:
 
@@ -16,7 +16,13 @@ Blobifier actions are supervised and PIN locked. The first heated test requires 
 
 ## Current release
 
-Version: **v0.4.3**
+Version: **v0.4.5**
+
+### Happy Hare parameter population fix
+
+The guided Happy Hare parameter page now reads the real `[mmu]` section inside `mmu/base/mmu_parameters.cfg`. Older GKCC drafts that used a synthetic `[mmu_parameters]` section are migrated automatically. The cfg context window now highlights the existing live line instead of proposing a duplicate section at the bottom of the file.
+
+`calibrated_bowden_length` is treated as a reference/calibration record rather than a writable `[mmu]` option because Happy Hare persists the saved calibration separately. Use the guided `MMU_CALIBRATE_BOWDEN ... SAVE=1` workflow to change the saved value.
 
 ### Teach machine positions
 
@@ -185,3 +191,7 @@ sudo bash uninstall.sh
 ```
 
 The uninstaller removes the service and updater entry but preserves local records, builder projects, and configuration backups in `~/printer_data/config/gkcc/`.
+
+### Guided section aliases
+
+GKCC can populate and edit equivalent Klipper layouts such as `[heater_fan controller_fan]` and `[controller_fan controller_fan]` without creating a duplicate section.
