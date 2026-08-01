@@ -1,0 +1,17 @@
+GKCC v0.5.2 three-file repair
+
+Replace these files in the ROOT of the GitHub GKCC repository:
+- CHANGELOG.md
+- blobifier_guide.json
+- calibration_center.py
+
+Use a fresh extraction of this repair archive. Do not rename the files and do not upload the enclosing folder.
+Commit message:
+Repair mismatched v0.5.2 release files
+
+Then refresh Mainsail Update Manager, update GKCC, and run:
+cd ~/GKCC
+sha256sum -c SHA256SUMS
+sudo bash install.sh
+
+All checksum entries must report OK before the service is replaced.
