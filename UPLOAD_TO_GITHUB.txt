@@ -1,11 +1,11 @@
-GKCC v0.4.5 GITHUB UPDATE STEPS
+GKCC v0.4.6 GITHUB UPDATE STEPS
 ================================
 
 IMPORTANT: Do not upload this ZIP as one file and stop there. GitHub will store
 it as a ZIP; it will not unpack it into the repository, and Moonraker cannot
 update the application that way.
 
-1. Extract GKCC_GitHub_Upload_v0.4.5.zip on your Windows PC.
+1. Extract GKCC_GitHub_Upload_v0.4.6.zip on your Windows PC.
 2. Open the extracted "GKCC-upload" folder.
 3. Open https://github.com/thatmanyouknow/GKCC in your browser.
 4. Click Add file -> Upload files.
@@ -14,10 +14,10 @@ update the application that way.
    files must appear at the root of the repository. Do not leave them inside
    another folder.
 6. Use this commit message:
-       Fix Happy Hare parameter population v0.4.5
+       Add live I/O and motion test bench v0.4.6
 7. Commit directly to the main branch.
 8. On the Releases or Tags page, create tag:
-       v0.4.5
+       v0.4.6
 
 UPDATE THE PRINTER
 ==================
@@ -25,20 +25,24 @@ UPDATE THE PRINTER
 In Mainsail, open Update Manager and press Update beside gkcc. Then refresh the
 GKCC page with Ctrl+F5.
 
-After the update:
+FIRST TEST
+==========
 
 1. Unlock GKCC.
-2. Open Configuration builder -> Start / import.
-3. Press Load/rebase live files again.
-4. Return to Happy Hare geometry and operating parameters.
-5. Existing values from the [mmu] section should populate and Open in cfg should
-   highlight the existing option instead of adding [mmu_parameters].
+2. Open ERCF / Happy Hare.
+3. Find Live I/O and motion test bench.
+4. Press and release each switch while watching its state and Changes count.
+5. Confirm the movement checklist before operating a servo or stepper.
+6. Start with Buzz gear / Buzz selector or servo UP/DOWN while standing beside
+   the printer.
+7. Use the red EMERGENCY STOP button for unexpected motion.
 
-WHAT v0.4.5 FIXES
-=================
+WHAT v0.4.6 ADDS
+================
 
-- Reads Happy Hare parameters from the real [mmu] section.
-- Migrates older GKCC draft values from the incorrect [mmu_parameters] section.
-- Routes [mmu] edits and exports to mmu/base/mmu_parameters.cfg.
-- Prevents calibrated_bowden_length from being added as an invalid [mmu] option.
-- Preserves the backed-up diff/review/live-apply workflow.
+- Live configured input indicators and pin names.
+- Switch transition counts.
+- Happy Hare servo and motor test controls.
+- Selector home and gate-selection tests with typed confirmation.
+- Klipper STEPPER_BUZZ for runtime-reported steppers.
+- Immediate Moonraker emergency stop.

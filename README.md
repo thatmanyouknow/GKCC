@@ -2,7 +2,7 @@
 
 GKCC is a lightweight browser-based configuration, calibration, and as-built documentation application for Klipper / Moonraker printers and ERCF / Happy Hare installations.
 
-## Happy Hare parameter population, position teaching, configuration context, and Blobifier commissioning (v0.4.5)
+## Live I/O diagnostics, Happy Hare setup, position teaching, configuration context, and Blobifier commissioning (v0.4.6)
 
 GKCC now includes a full first-run workflow for an installed Blobifier:
 
@@ -16,7 +16,22 @@ Blobifier actions are supervised and PIN locked. The first heated test requires 
 
 ## Current release
 
-Version: **v0.4.5**
+Version: **v0.4.6**
+
+### Live I/O and motion test bench
+
+The ERCF / Happy Hare page now includes a supervised hardware diagnostic bench:
+
+- Live indicators for configured endstops, `gcode_button` inputs, filament sensors, probe state, and Happy Hare sensor fields.
+- Pin names are shown beside live states when they can be matched to the loaded configuration project.
+- Digital state changes are counted so an operator can press and release a switch while watching the GUI.
+- Happy Hare selector-servo tests for `UP`, `MOVE`, `DOWN`, and a typed-confirmation direct angle.
+- Happy Hare gear, selector, and servo buzz tests.
+- Guarded selector homing and gate-selection controls.
+- Klipper `STEPPER_BUZZ` controls limited to steppers reported by the live `motion_report` object.
+- A Moonraker emergency-stop button that uses the immediate emergency-stop endpoint rather than queueing `M112` behind other G-code.
+
+Input status is polled about once per second. GKCC can only display a live state for pins that are already represented by a loaded Klipper object. An arbitrary raw MCU pin cannot be read safely without first adding a suitable Klipper input object and restarting Klipper.
 
 ### Happy Hare parameter population fix
 
@@ -104,6 +119,8 @@ The operator must unlock machine controls with the GKCC PIN and type `APPLY` bef
 - Upload failure triggers immediate restoration of the transaction backup.
 - Optional restart validation automatically restores the backup if Klipper returns `error`, `shutdown`, or does not return ready before the timeout.
 - An automatic backup cannot prove that pins, thermistors, currents, heaters, travel limits, or imported values are safe for the connected hardware.
+- Hardware motion tests require PIN unlock, an idle printer, and an operator safety acknowledgement. Direct servo angle, selector home, gate selection, and generic stepper buzz require typed confirmations.
+- Generic Klipper stepper buzz is restricted to stepper names reported by the live `motion_report` object.
 - Each individual manual filament move remains limited by the backend to 100 mm and 100 mm/s.
 - Each XYZ teaching jog is limited to 25 mm, requires XYZ homed, is blocked during printing or pause, and is checked against Klipper axis limits. XY jog speed is capped at 50 mm/s and Z at 10 mm/s.
 - Hotend targets remain limited to 290 °C.
