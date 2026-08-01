@@ -12,7 +12,7 @@
     {
       "id": "blob_power_off_wiring",
       "title": "Verify wiring with printer power removed",
-      "summary": "Confirm 5 V and ground, the servo-capable output pin, the bucket-switch input with pull-up, connector pin order, strain relief, and clearance from mains wiring before powering the printer.",
+      "summary": "Confirm 5 V and ground, then enter the exact Klipper servo output pin and bucket-switch input pin in GKCC. Record the controller and physical connector, verify pull-up/inversion syntax, strain relief, and clearance from mains wiring before powering the printer.",
       "kind": "confirm"
     },
     {

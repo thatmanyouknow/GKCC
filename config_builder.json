@@ -68,7 +68,7 @@
           "key": "printer.max_accel",
           "section": "printer",
           "option": "max_accel",
-          "label": "Maximum acceleration (mm/s²)",
+          "label": "Maximum acceleration (mm/s\u00b2)",
           "type": "number",
           "required": true,
           "min": 1,
@@ -88,7 +88,7 @@
           "key": "printer.max_z_accel",
           "section": "printer",
           "option": "max_z_accel",
-          "label": "Maximum Z acceleration (mm/s²)",
+          "label": "Maximum Z acceleration (mm/s\u00b2)",
           "type": "number",
           "required": true,
           "min": 1,
@@ -627,7 +627,7 @@
         },
         {
           "key": "meta.toolhead_entry_to_sensor_measured",
-          "label": "Manual entrance → toolhead sensor (mm)",
+          "label": "Manual entrance \u2192 toolhead sensor (mm)",
           "type": "number",
           "min": 0,
           "step": 0.1,
@@ -635,7 +635,7 @@
         },
         {
           "key": "meta.toolhead_entry_to_nozzle_outside",
-          "label": "Manual entrance → outside nozzle tip (mm)",
+          "label": "Manual entrance \u2192 outside nozzle tip (mm)",
           "type": "number",
           "min": 0,
           "step": 0.1,
@@ -1065,12 +1065,27 @@
           ]
         },
         {
+          "key": "meta.blobifier_servo_board",
+          "label": "Servo controller / physical connector",
+          "type": "text",
+          "placeholder": "Spider main MCU, SERVOS / PB6",
+          "help": "Documentation field used in the as-built manual."
+        },
+        {
+          "key": "meta.blobifier_bucket_board",
+          "label": "Bucket switch controller / physical connector",
+          "type": "text",
+          "placeholder": "Spider main MCU, STOP_7 / PG15",
+          "help": "Documentation field used in the as-built manual."
+        },
+        {
           "key": "mmu_servo blobifier.pin",
           "section": "mmu_servo blobifier",
           "option": "pin",
           "label": "Blobifier servo signal pin",
           "type": "text",
-          "help": "Servo-capable output pin. Verify voltage and pin capability from the controller documentation."
+          "help": "Enter the complete Klipper pin name. Include the MCU prefix when needed. Verify signal voltage and connector pinout from the board documentation.",
+          "placeholder": "PB6 or mmu:PA8"
         },
         {
           "key": "mmu_servo blobifier.minimum_pulse_width",
@@ -1108,8 +1123,8 @@
           "option": "pin",
           "label": "Bucket switch pin",
           "type": "text",
-          "placeholder": "^PG15",
-          "help": "The official example uses an input pull-up prefix (^). Confirm the electrical logic on your board."
+          "placeholder": "^PG15 or ^!mmu:PA1",
+          "help": "Enter the complete Klipper pin syntax. ^ enables a pull-up and ! inverts logic. Confirm the switch wiring and electrical logic."
         }
       ]
     },
@@ -1244,7 +1259,7 @@
           "key": "gcode_macro BLOBIFIER.variable_brush_accel",
           "section": "gcode_macro BLOBIFIER",
           "option": "variable_brush_accel",
-          "label": "Brush acceleration (mm/s²)",
+          "label": "Brush acceleration (mm/s\u00b2)",
           "type": "number",
           "min": 0,
           "step": 100
@@ -1269,7 +1284,7 @@
           "key": "gcode_macro BLOBIFIER.variable_shake_accel",
           "section": "gcode_macro BLOBIFIER",
           "option": "variable_shake_accel",
-          "label": "Shaker acceleration (mm/s²)",
+          "label": "Shaker acceleration (mm/s\u00b2)",
           "type": "number",
           "min": 0,
           "step": 100
@@ -1341,7 +1356,7 @@
           "key": "gcode_macro BLOBIFIER.variable_purge_temp_min",
           "section": "gcode_macro BLOBIFIER",
           "option": "variable_purge_temp_min",
-          "label": "Minimum purge temperature (°C)",
+          "label": "Minimum purge temperature (\u00b0C)",
           "type": "number",
           "min": 0,
           "max": 350,

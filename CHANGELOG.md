@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.4.2
+
+- Added an always-visible configuration file window beside the guided variable forms.
+- Focusing a guided field now opens the actual imported/live `.cfg` file and highlights the exact section and option being edited.
+- Added line numbers, current-versus-draft status, added-line highlighting, file selection, automatic scrolling, and a large modal editor view.
+- Blobifier servo and bucket pin fields now open `blobifier_hw.cfg` directly and highlight the corresponding `pin:` line while typing.
+- The viewer preserves raw comments and macro bodies; live writes still require preview, backup, approval, and validation.
+
+## v0.4.1
+
+- Added a visible **Hardware pins** panel directly to Blobifier Commissioning.
+- Servo and bucket-switch pins populate automatically from imported or live `blobifier_hw.cfg`.
+- Added controller/physical-connector notes for the as-built manual.
+- Added generated `blobifier_hw.cfg` preview and exact duplicate-pin checks.
+- Added direct save and live-diff controls beside the pin fields.
+
 ## v0.4.0 — Guided Blobifier commissioning
 
 - Added a dedicated Blobifier page, interactive geometry diagram, detected-installation panel, and 17-step commissioning manual.

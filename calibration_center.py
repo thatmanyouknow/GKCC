@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""GKCC Calibration Center v0.4.0.
+"""GKCC Calibration Center v0.4.2.
 
 A small local web service for guided Klipper and Happy Hare calibration.
 The first release is intentionally conservative: it reads status, sends a
@@ -538,7 +538,7 @@ def public_config() -> Dict[str, Any]:
         "printer_name": cfg.get("printer_name", "Voron"),
         "allow_machine_actions": bool(cfg.get("allow_machine_actions", True)),
         "allow_live_config_writes": bool(cfg.get("allow_live_config_writes", True)),
-        "version": "0.4.0",
+        "version": "0.4.2",
     }
 
 
@@ -1736,7 +1736,7 @@ h1{{font-size:34px;margin-bottom:4px}}h2{{border-bottom:2px solid #222;padding-b
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "GKCC/0.4.0"
+    server_version = "GKCC/0.4.2"
 
     @property
     def client_ip(self) -> str:
@@ -2118,7 +2118,7 @@ def main() -> None:
     threading.Thread(target=status_worker, name="moonraker-status", daemon=True).start()
     port = int(config()["port"])
     server = ThreadingHTTPServer(("0.0.0.0", port), Handler)
-    print(f"GKCC Calibration Center v0.4.0: http://0.0.0.0:{port}")
+    print(f"GKCC Calibration Center v0.4.2: http://0.0.0.0:{port}")
     print("Live configuration writes use backup, diff review, restart validation, and rollback.")
     try:
         server.serve_forever()
